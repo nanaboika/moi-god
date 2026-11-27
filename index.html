@@ -1,0 +1,1900 @@
+<!doctype html>
+<html lang="ru" translate="no">
+<head>
+<meta name="google" content="notranslate">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f5f1e9">
+<meta name="description" content="МОЙ ГОД — персональная система планирования жизни на 2027 год.">
+<title>МОЙ ГОД — планировщик жизни</title>
+<style>
+:root{--paper:#f5f1e9;--card:#fffdf8;--ink:#292a28;--muted:#77766f;--gold:#b39455;--gold2:#d8c49a;--line:#e7e0d4;--sage:#68796a;--shadow:0 12px 35px rgba(48,42,30,.07)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;touch-action:manipulation}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.app{max-width:1180px;margin:auto;min-height:100vh;padding:0 22px 50px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:24px 0 18px;border-bottom:1px solid var(--line);gap:12px}
+.brand{font-family:Georgia,serif;font-size:25px;letter-spacing:.13em}
+.brand small{display:block;font:10px sans-serif;letter-spacing:.22em;color:var(--muted);margin-top:3px}
+.topright{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.yearpill{border:1px solid var(--gold2);padding:7px 12px;border-radius:30px;color:#806a3f;font-size:13px;white-space:nowrap}
+.syncpill{font-size:11px;color:var(--sage);background:rgba(104,121,106,.12);padding:6px 11px;border-radius:20px;white-space:nowrap;border:1px solid rgba(104,121,106,.2)}
+.layout{display:grid;grid-template-columns:235px 1fr;gap:28px;padding-top:25px}
+.nav{position:sticky;top:15px;align-self:start;background:rgba(255,253,248,.85);border:1px solid var(--line);border-radius:18px;padding:13px;z-index:5}
+.nav button{width:100%;text-align:left;background:none;border:0;padding:11px 12px;border-radius:10px;color:#55554f;font-size:13px;margin:2px 0;transition:.15s}
+.nav button.active,.nav button:hover{background:#eee7d9;color:var(--ink)}
+.content{min-width:0;position:relative;z-index:2}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:220px;height:220px;border:1px solid #e8dfce;border-radius:50%;right:-65px;top:-105px;box-shadow:0 0 0 18px rgba(179,148,85,.035),0 0 0 38px rgba(179,148,85,.025);pointer-events:none;z-index:0}
+.hero > *{position:relative;z-index:1}
+.eyebrow{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.hero h1{font:34px/1.16 Georgia,serif;font-weight:400;margin:10px 0}
+.hero p{color:var(--muted);max-width:620px;margin:0}
+.hero-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{border:1px solid var(--gold);background:var(--ink);color:#fffdf8;border-radius:30px;padding:10px 17px;font-size:13px;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.secondary:hover{background:#eee7d9}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#fffdf8}
+.btn.danger{background:transparent;color:#a84a3f;border-color:#e3c5c1}
+.btn.sm{padding:6px 12px;font-size:12px}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:28px 0 14px;flex-wrap:wrap}
+.sectionhead h2{font:27px Georgia,serif;font-weight:400;margin:0}
+.sectionhead p{color:var(--muted);font-size:13px;margin:4px 0 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tile,.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:18px}
+.tile{min-height:132px;cursor:pointer;transition:.18s}
+.tile:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.tile .num{font:24px Georgia,serif;color:var(--gold)}
+.tile h3{font:18px Georgia,serif;font-weight:400;margin:8px 0 3px}
+.tile p,.muted{color:var(--muted);font-size:13px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:15px}
+.stat{background:#eee8dc;border-radius:14px;padding:14px}
+.stat strong{font:25px Georgia,serif;display:block}
+.stat span{font-size:11px;color:var(--muted)}
+.progress{height:6px;background:#e8e1d5;border-radius:20px;overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;background:var(--gold);border-radius:20px;transition:width .3s}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.field label{font-size:12px;color:#77766f}
+.field input,.field textarea,.field select{width:100%;background:#fffefa;border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);outline:none;font-size:16px}
+.field textarea{min-height:90px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.item{padding:13px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.tag{display:inline-block;background:#eee8dc;color:#74613c;padding:4px 9px;border-radius:20px;font-size:11px}
+.tag.warn{background:#f7e8e4;color:#9b453a}
+.tag.date{background:#eef1ec;color:#4f6152}
+.tag.remind{background:#fbf3e1;color:#8c6c2b;border:1px solid #ead7ad}
+.del{border:0;background:none;color:#a49c8d;font-size:21px;padding:4px 10px}
+.del:hover{color:#a84a3f}
+.wheelwrap{display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:20px;align-items:center}
+.wheel{width:100%;max-width:390px;margin:auto;display:block}
+.rangeRow{display:grid;grid-template-columns:1fr 44px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.rangeLabels{display:flex;justify-content:space-between;font-size:10px;color:#a19a8d;margin-top:-2px}
+input[type=range]{accent-color:var(--gold);width:100%;height:28px}
+.focus-card{display:grid;grid-template-columns:220px 1fr;gap:18px;align-items:start;background:#fffefa;border:1px solid var(--gold2);border-radius:15px;padding:16px;margin-bottom:12px}
+.focus-steps{display:flex;flex-direction:column;gap:8px}
+.focus-step-row{display:flex;align-items:center;gap:8px}
+.focus-step-row span{font:13px Georgia,serif;color:var(--gold);min-width:18px}
+.focus-step-row input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 11px;color:var(--ink);font-size:14px;outline:none}
+.focus-step-row input:focus{border-color:var(--gold)}
+.months{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.month{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fffefa;min-height:105px;cursor:pointer;transition:.15s}
+.month:hover,.month.selected{border-color:var(--gold);background:#fbf7ee}
+.month strong{font:17px Georgia,serif;display:block;margin-bottom:6px}
+.month small{color:var(--muted)}
+.current-banner{background:var(--card);border:1px solid var(--gold2);border-radius:18px;padding:20px 22px;margin-top:16px;box-shadow:var(--shadow)}
+.current-preview-list{margin:12px 0 0;padding:0;list-style:none}
+.current-preview-list li{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.current-preview-list li:last-child{border-bottom:0}
+/* Квадратные карточки желаний и шагов в месяце */
+.vision-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+.vision-card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(48,42,30,.05);transition:.2s}
+.vision-card:hover{border-color:var(--gold2);box-shadow:var(--shadow)}
+.vision-card.is-done{opacity:.82}
+.vision-photo{position:relative;aspect-ratio:1/1;background:linear-gradient(145deg,#f3ece0,#ebe2d1);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
+.vision-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.vision-plus{display:flex;flex-direction:column;align-items:center;gap:6px;color:#8c774d;text-align:center;padding:12px}
+.vision-plus-circle{width:46px;height:46px;border-radius:50%;border:1.5px dashed var(--gold);background:rgba(255,253,248,.85);display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;color:var(--gold);transition:.15s}
+.vision-photo:hover .vision-plus-circle{transform:scale(1.07);background:var(--card)}
+.vision-plus span{font-size:11px;letter-spacing:.04em}
+.vision-photo-badge{position:absolute;top:9px;left:9px;background:rgba(255,253,248,.92);backdrop-filter:blur(4px);padding:3px 9px;border-radius:20px;font-size:10.5px;color:#6e5b36;max-width:calc(100% - 52px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vision-photo-del{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(41,42,40,.6);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center}
+.vision-body{padding:13px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.vision-head{display:flex;align-items:flex-start;gap:8px}
+.vision-head input[type=checkbox]{accent-color:var(--sage);width:17px;height:17px;margin-top:2px;flex-shrink:0;cursor:pointer}
+.vision-title{font:15px/1.35 Georgia,serif;flex:1;min-width:0;word-break:break-word;cursor:pointer}
+.vision-date-bar{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--muted)}
+.vision-date-input{border:1px solid var(--line);background:#fbf8f1;border-radius:8px;padding:3px 7px;font-size:11.5px;color:var(--ink);outline:none;max-width:132px}
+.vision-date-input:focus{border-color:var(--gold)}
+.vision-steps{border-top:1px solid var(--line);padding-top:7px;display:flex;flex-direction:column;gap:4px}
+.vision-step{display:flex;align-items:center;gap:6px;font-size:12px}
+.vision-step input[type=checkbox]{accent-color:var(--sage);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.vision-step span.num{color:var(--gold);font-family:Georgia,serif;font-size:11.5px;min-width:13px}
+.vision-step input[type=text]{flex:1;min-width:0;border:0;border-bottom:1px dashed transparent;background:transparent;padding:2px 0;font-size:12px;color:var(--ink);outline:none}
+.vision-step input[type=text]:focus{border-bottom-color:var(--gold)}
+.vision-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px;border-top:1px solid #f1ece2}
+.vision-add-card{border:1.5px dashed var(--gold2);background:rgba(255,253,248,.6);border-radius:18px;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8c774d;cursor:pointer;padding:18px;text-align:center;transition:.15s}
+.vision-add-card:hover{background:var(--card);border-color:var(--gold)}
+.board-mode .hide-in-board{display:none!important}
+.board-mode .vision-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.board-mode .vision-body{padding:10px 11px 11px;gap:6px}
+.board-mode .vision-title{font-size:13.5px}
+.board-mode .vision-step input[type=text]{pointer-events:none}
+.board-header-banner{display:none;text-align:center;padding:10px 0 6px}
+.board-mode .board-header-banner{display:block}
+/* Эффект реальных бумажных фотографий, разбросанных по столу */
+.year-collage{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;padding:24px 16px 40px;margin-top:10px;position:relative}
+.polaroid-card{position:relative;width:235px;background:#fffefb;padding:11px 11px 15px;border-radius:3px;border:1px solid rgba(215,204,185,.75);box-shadow:0 12px 26px rgba(42,35,24,.16),0 3px 7px rgba(42,35,24,.09);margin:-10px -12px;cursor:pointer;transition:transform .28s cubic-bezier(.22,.61,.36,1),box-shadow .28s,z-index 0s;transform:rotate(var(--rot,0deg)) translate(var(--tx,0px),var(--ty,0px));z-index:var(--z,1);user-select:none}
+.polaroid-card:before,.polaroid-card:after{content:"";position:absolute;bottom:11px;width:44%;height:14px;z-index:-1;box-shadow:0 12px 14px rgba(34,27,18,.26);transition:opacity .25s}
+.polaroid-card:before{left:9px;transform:rotate(-3.2deg)}
+.polaroid-card:after{right:9px;transform:rotate(3.2deg)}
+.polaroid-card:hover{transform:rotate(0deg) translateY(-10px) scale(1.06)!important;z-index:50!important;box-shadow:0 24px 44px rgba(38,31,20,.24),0 6px 14px rgba(38,31,20,.12)}
+.polaroid-photo-wrap{position:relative;aspect-ratio:1/1;width:100%;overflow:hidden;background:#efe8dc;border:1px solid rgba(0,0,0,.05)}
+.polaroid-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block;filter:contrast(1.02) saturate(1.03)}
+.polaroid-photo-wrap:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 18px rgba(45,35,20,.08);pointer-events:none}
+.polaroid-month-pin{position:absolute;top:8px;left:8px;background:rgba(255,253,248,.94);color:#6e5b36;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;letter-spacing:.03em;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.polaroid-caption-area{padding:11px 4px 2px;text-align:center}
+.polaroid-title{font:15px/1.3 Georgia,serif;color:#2b2925;word-break:break-word}
+.polaroid-meta{font-size:11px;color:#8a7f6d;margin-top:4px}
+.polaroid-steps-mini{margin-top:7px;padding-top:6px;border-top:1px dashed #e6decb;text-align:left;font-size:11px;color:#5c584f;display:flex;flex-direction:column;gap:2px}
+.polaroid-steps-mini div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.board-mode .year-collage{padding:18px 8px 34px;background:radial-gradient(circle at 50% 40%,rgba(255,253,248,.65),rgba(235,226,210,.45));border-radius:22px;border:1px solid var(--line)}
+.board-mode .polaroid-card{width:186px;padding:9px 9px 13px;margin:-14px -15px}
+.board-mode .polaroid-title{font-size:13.5px}
+.board-mode .polaroid-card:hover{transform:rotate(var(--rot,0deg)) translate(var(--tx,0px),var(--ty,0px))!important}
+.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:13px;font-size:13px}
+.footer{color:#a19a8d;font-size:11px;text-align:center;padding:30px 0 10px}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#292a28;color:#fff;padding:10px 18px;border-radius:30px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:99}
+.toast.show{opacity:1}
+.mobilebar{display:none}
+.modal-backdrop{position:fixed;inset:0;background:rgba(41,42,40,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:90;backdrop-filter:blur(3px)}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:440px;width:100%;box-shadow:var(--shadow);max-height:90vh;overflow-y:auto}
+.modal h3{font:21px Georgia,serif;font-weight:400;margin:0 0 8px}
+.tabs{display:flex;gap:6px;background:#eee8dc;padding:4px;border-radius:12px;margin-bottom:14px}
+.tabs button{flex:1;border:0;background:none;padding:8px;border-radius:9px;font-size:13px;color:var(--muted)}
+.tabs button.active{background:var(--card);color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.auth-banner{background:#fbf7ee;border:1px solid var(--gold2);border-radius:16px;padding:14px 18px;margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+@media(max-width:760px){
+  .app{padding:0 14px 92px}
+  .top{padding:15px 0}
+  .brand{font-size:20px}
+  .layout{display:block;padding-top:15px}
+  .nav{display:none}
+  .hero{padding:22px 18px}
+  .hero h1{font-size:27px}
+  .grid{grid-template-columns:1fr 1fr;gap:9px}
+  .tile{padding:13px;min-height:118px}
+  .tile h3{font-size:16px}
+  .stats{gap:7px}
+  .stat{padding:10px}
+  .stat strong{font-size:21px}
+  .formgrid{grid-template-columns:1fr}
+  .wheelwrap{grid-template-columns:1fr}
+  .focus-card{grid-template-columns:1fr;gap:12px}
+  .months{grid-template-columns:repeat(2,1fr)}
+  .vision-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .vision-body{padding:10px 10px 11px}
+  .vision-title{font-size:14px}
+  .polaroid-card{width:162px;padding:8px 8px 12px;margin:-8px -9px}
+  .polaroid-title{font-size:13px}
+  .board-mode .polaroid-card{width:152px;padding:7px 7px 11px;margin:-11px -11px}
+  .mobilebar{display:flex;position:fixed;bottom:0;left:0;right:0;background:rgba(255,253,248,.98);border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom));justify-content:space-around;z-index:50;backdrop-filter:blur(10px)}
+  .mobilebar button{background:none;border:0;color:#777;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 6px;min-width:48px}
+  .mobilebar b{font-size:18px;font-weight:400}
+  .mobilebar button.active{color:#967b43}
+  .sectionhead h2{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand">МОЙ ГОД<small>ПРОЕКТИРУЙ. ДЕЙСТВУЙ. ЖИВИ.</small></div>
+  <div class="topright">
+    <button type="button" class="syncpill" id="syncStatus" data-action="open-auth">Облако: Войти</button>
+    <span class="yearpill" id="yearLabel">2027 · МОЙ ПЛАН</span>
+  </div>
+</header>
+<div class="layout">
+<aside class="nav" id="sideNav">
+  <button type="button" data-page="home" class="active">Главная</button>
+  <button type="button" data-page="months">Мой год</button>
+  <button type="button" data-page="vision">Карта желаний</button>
+  <button type="button" data-page="goals">Желания и цели</button>
+  <button type="button" data-page="wheel">Колесо баланса</button>
+  <button type="button" data-page="future">Путешествие в будущее</button>
+  <button type="button" data-page="review">Итоги года</button>
+  <button type="button" data-page="hobbies">Хочу попробовать</button>
+  <button type="button" data-page="settings">Аккаунт и данные</button>
+</aside>
+<main class="content" id="main"></main>
+</div>
+<div class="footer">МОЙ ГОД · Личное пространство для планирования жизни</div>
+</div>
+
+<nav class="mobilebar" id="mobileNav">
+  <button type="button" data-page="home" class="active"><b>⌂</b>Главная</button>
+  <button type="button" data-page="months"><b>▦</b>Мой год</button>
+  <button type="button" data-page="vision"><b>🖼</b>Карта</button>
+  <button type="button" data-page="goals"><b>◎</b>Цели</button>
+  <button type="button" data-page="wheel"><b>◉</b>Баланс</button>
+  <button type="button" data-page="settings"><b>⚙</b>Профиль</button>
+</nav>
+
+<input type="file" id="cardPhotoInput" accept="image/*" hidden>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div class="toast" id="toast">Сохранено</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://sktdzgzzthmhtslmltac.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_5DhJevtuh0t17B1vvabFFQ_OlkGbD48';
+let sb = null;
+try {
+  if (window.supabase) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch (e) {}
+
+const KEY = 'moi-god-v1';
+const ACCOUNT_KEY = 'moi-god-account-v1';
+const spheres = ['Здоровье и внешность','Семья и дети','Отношения с партнёром','Деньги','Работа и карьера','Бизнес и самореализация','Отдых и путешествия','Развитие и хобби'];
+const months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const monthsGen = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const monthsPrep = ['январе','феврале','марте','апреле','мая','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
+const startMonthIdx = 0; // Старт года с января 2027
+
+const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+let telegramUserId = null;
+
+if (tg) {
+  try {
+    tg.ready();
+    tg.expand();
+    if (typeof tg.disableVerticalSwipes === 'function') {
+      tg.disableVerticalSwipes();
+    }
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+      telegramUserId = 'tg_' + String(tg.initDataUnsafe.user.id);
+    }
+  } catch (e) {}
+}
+
+let savedAccount = null;
+try {
+  savedAccount = JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null');
+} catch (e) {}
+
+let data = null;
+let page = 'home';
+let activeMonth = 0;
+let monthViewMode = 'grid';
+let visionBoardScreenshotMode = false;
+let pendingPhotoTarget = null;
+let saveTimer = null;
+
+function formatRuDate(iso) {
+  if (!iso) return '';
+  const parts = iso.split('-');
+  if (parts.length !== 3) return iso;
+  const d = parseInt(parts[2], 10);
+  const m = parseInt(parts[1], 10) - 1;
+  if (isNaN(d) || isNaN(m) || !monthsGen[m]) return iso;
+  return `${d} ${monthsGen[m]}`;
+}
+
+function getDefaultDateForMonth(mIdx) {
+  const y = data.year || 2027;
+  const m = String(mIdx + 1).padStart(2, '0');
+  return `${y}-${m}-15`;
+}
+
+function ensureTaskStructure(t) {
+  if (!t) return;
+  if (!Array.isArray(t.steps)) {
+    t.steps = [
+      { text: '', done: false },
+      { text: '', done: false },
+      { text: '', done: false }
+    ];
+  }
+  while (t.steps.length < 3) {
+    t.steps.push({ text: '', done: false });
+  }
+}
+
+function syncGoalsToMonths() {
+  let changed = false;
+  (data.goals || []).forEach(g => {
+    if (!g.id) {
+      g.id = 'g_' + Math.random().toString(36).slice(2, 9);
+      changed = true;
+    }
+    if (g.month !== '' && g.month !== undefined && g.month !== null) {
+      const mi = +g.month;
+      if (!isNaN(mi) && mi >= 0 && mi < 12) {
+        data.monthly[mi] ??= [];
+        const exists = data.monthly[mi].some(t =>
+          (t.goalId && t.goalId === g.id && t.autoFromGoal) ||
+          (t.goal === g.title && t.text === g.title)
+        );
+        if (!exists && !g._removedFromMonth) {
+          const item = { text: g.title, goal: g.title, goalId: g.id, autoFromGoal: true, done: false, note: '', dueDate: '', reminder: '' };
+          ensureTaskStructure(item);
+          data.monthly[mi].push(item);
+          changed = true;
+        }
+      }
+    }
+  });
+
+  (data.hobbies || []).forEach(h => {
+    if (!h.id) {
+      h.id = 'h_' + Math.random().toString(36).slice(2, 9);
+      changed = true;
+    }
+    if (h.month !== '' && h.month !== undefined && h.month !== null) {
+      const mi = +h.month;
+      if (!isNaN(mi) && mi >= 0 && mi < 12) {
+        data.monthly[mi] ??= [];
+        const exists = data.monthly[mi].some(t =>
+          (t.hobbyId && t.hobbyId === h.id) ||
+          (t.goal === 'Хочу попробовать' && t.text === h.title)
+        );
+        if (!exists && !h._removedFromMonth) {
+          const item = { text: h.title, goal: 'Хочу попробовать', hobbyId: h.id, autoFromHobby: true, done: !!h.done, note: h.step ? 'Первый шаг: ' + h.step : '', dueDate: '', reminder: '' };
+          ensureTaskStructure(item);
+          if (h.step) item.steps[0].text = h.step;
+          data.monthly[mi].push(item);
+          changed = true;
+        }
+      }
+    }
+  });
+
+  Object.keys(data.monthly || {}).forEach(mi => {
+    (data.monthly[mi] || []).forEach(t => ensureTaskStructure(t));
+  });
+
+  return changed;
+}
+
+function getUnscheduledItems() {
+  const list = [];
+  data.wheelActions ??= {};
+  data.wheelScheduled ??= {};
+  for (let i = 0; i < spheres.length; i++) {
+    if ((data.ratings[i] || 5) < 5) {
+      const steps = data.wheelActions[i] || ['', '', ''];
+      for (let s = 0; s < 3; s++) {
+        const text = (steps[s] || '').trim();
+        const key = `${i}_${s}`;
+        if (text && !data.wheelScheduled[key]) {
+          list.push({
+            uid: `wheel:${key}`,
+            source: 'wheel',
+            key,
+            sphereIdx: i,
+            stepIdx: s,
+            badge: spheres[i],
+            text,
+            sub: ''
+          });
+        }
+      }
+    }
+  }
+
+  (data.hobbies || []).forEach((h, idx) => {
+    if (!h.id) h.id = 'h_' + idx + '_' + Math.random().toString(36).slice(2, 6);
+    const hasNoMonth = (h.month === '' || h.month === undefined || h.month === null);
+    if (hasNoMonth && !h._dismissedInbox) {
+      list.push({
+        uid: `hobby:${h.id}`,
+        source: 'hobby',
+        hobbyId: h.id,
+        badge: 'Хочу попробовать',
+        text: h.title,
+        sub: h.step ? 'Первый шаг: ' + h.step : (h.why || '')
+      });
+    }
+  });
+
+  return list;
+}
+
+function blank() {
+  return {
+    year: 2027,
+    review: {},
+    ratings: Array(8).fill(5),
+    wheelPriority: '',
+    wheelActions: {},
+    wheelScheduled: {},
+    future: {},
+    goals: [],
+    hobbies: [],
+    monthly: {},
+    reflections: {}
+  };
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    const loaded = raw ? { ...blank(), ...JSON.parse(raw) } : blank();
+    if (!loaded.year || loaded.year < 2027) loaded.year = 2027;
+    loaded.wheelActions ??= {};
+    loaded.wheelScheduled ??= {};
+    loaded.goals ??= [];
+    loaded.hobbies ??= [];
+    loaded.monthly ??= {};
+    data = loaded;
+    syncGoalsToMonths();
+    return loaded;
+  } catch (e) {
+    return blank();
+  }
+}
+
+data = loadLocal();
+
+function getActiveCloudId() {
+  if (savedAccount && savedAccount.email) {
+    return 'email_' + savedAccount.email.toLowerCase().trim();
+  }
+  if (telegramUserId) {
+    return telegramUserId;
+  }
+  return null;
+}
+
+function setSyncLabel(text) {
+  const el = document.getElementById('syncStatus');
+  if (el) el.textContent = text;
+}
+
+async function hashPassword(str) {
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str + '_moigod_salt'));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+}
+
+async function initCloud() {
+  const cloudId = getActiveCloudId();
+  if (!sb || !cloudId) {
+    setSyncLabel('Войти в облако');
+    return;
+  }
+  setSyncLabel('Синхронизация...');
+  try {
+    const { data: row, error } = await sb
+      .from('user_plans')
+      .select('data')
+      .eq('telegram_id', cloudId)
+      .maybeSingle();
+
+    if (!error && row && row.data) {
+      const remoteData = { ...row.data };
+      delete remoteData._auth_hash;
+      data = { ...blank(), ...remoteData };
+      if (!data.year || data.year < 2027) data.year = 2027;
+      data.wheelActions ??= {};
+      data.wheelScheduled ??= {};
+      syncGoalsToMonths();
+      localStorage.setItem(KEY, JSON.stringify(data));
+      render();
+    } else if (!error && !row) {
+      await pushToCloud();
+    }
+    setSyncLabel(savedAccount ? savedAccount.email : 'Telegram ✓');
+  } catch (e) {
+    setSyncLabel('Офлайн');
+  }
+}
+
+async function pushToCloud() {
+  const cloudId = getActiveCloudId();
+  if (!sb || !cloudId) return;
+  setSyncLabel('Сохранение...');
+  try {
+    const payload = { ...data };
+    if (savedAccount && savedAccount.hash) {
+      payload._auth_hash = savedAccount.hash;
+    }
+    const { error } = await sb
+      .from('user_plans')
+      .upsert({
+        telegram_id: cloudId,
+        data: payload,
+        updated_at: new Date().toISOString()
+      });
+    setSyncLabel(error ? 'Ошибка сети' : (savedAccount ? savedAccount.email : 'Telegram ✓'));
+  } catch (e) {
+    setSyncLabel('Ошибка сети');
+  }
+}
+
+function save(msg = true) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+  } catch (e) {
+    toast('Память переполнена — попробуй уменьшить размер фото');
+  }
+  if (msg) toast('Сохранено');
+  if (sb && getActiveCloudId()) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(pushToCloud, 600);
+  }
+}
+
+function toast(t) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = t;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function openModal(html) {
+  document.getElementById('modalBox').innerHTML = html;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+function nav(p) {
+  if (!pages[p]) return;
+  page = p;
+  if (p === 'months') {
+    monthViewMode = 'grid';
+    visionBoardScreenshotMode = false;
+  }
+  if (p === 'vision') {
+    visionBoardScreenshotMode = false;
+  }
+  document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === p));
+  render();
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+}
+
+function openMonthPage(mi) {
+  activeMonth = mi;
+  page = 'months';
+  monthViewMode = 'detail';
+  visionBoardScreenshotMode = false;
+  document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === 'months'));
+  render();
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+}
+
+function head(title, sub, action = '') {
+  return `<div class="sectionhead"><div><div class="eyebrow">МОЙ ${data.year} ГОД</div><h2>${title}</h2><p>${sub || ''}</p></div>${action}</div>`;
+}
+
+function render() {
+  document.getElementById('yearLabel').textContent = data.year + ' · МОЙ ПЛАН';
+  const m = document.getElementById('main');
+  m.innerHTML = pages[page]();
+  wire();
+}
+
+function compressImageToDataUrl(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxSide = 680;
+      let w = img.width;
+      let h = img.height;
+      if (w > h && w > maxSide) {
+        h = Math.round(h * maxSide / w);
+        w = maxSide;
+      } else if (h >= w && h > maxSide) {
+        w = Math.round(w * maxSide / h);
+        h = maxSide;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function downloadTaskIcs(mi, ti) {
+  const t = (data.monthly[mi] || [])[ti];
+  if (!t) return;
+  const dateStr = (t.dueDate || getDefaultDateForMonth(mi)).replace(/-/g, '');
+  const timeParts = (t.reminder || '10:00').split(':');
+  const hh = String(timeParts[0] || '10').padStart(2, '0');
+  const mm = String(timeParts[1] || '00').padStart(2, '0');
+  const dtStart = `${dateStr}T${hh}${mm}00`;
+  const endHour = String((parseInt(hh, 10) + 1) % 24).padStart(2, '0');
+  const dtEnd = `${dateStr}T${endHour}${mm}00`;
+  const nowStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const desc = (t.note ? t.note + '\\n' : '') + (t.goal ? 'Цель: ' + t.goal : 'Планировщик МОЙ ГОД');
+
+  const icsLines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//MOI GOD//Planner//RU',
+    'BEGIN:VEVENT',
+    `UID:moigod-${mi}-${ti}-${Date.now()}@moigod`,
+    `DTSTAMP:${nowStamp}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${t.text.replace(/\r?\n/g, ' ')}`,
+    `DESCRIPTION:${desc.replace(/\r?\n/g, '\\n')}`,
+    'BEGIN:VALARM',
+    'TRIGGER:-PT15M',
+    'ACTION:DISPLAY',
+    `DESCRIPTION:${t.text.replace(/\r?\n/g, ' ')}`,
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const blob = new Blob([icsLines], { type: 'text/calendar;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `napominanie-${dateStr}.ics`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Файл для календаря скачан');
+}
+
+function openTaskDetailModal(mi, ti) {
+  const t = (data.monthly[mi] || [])[ti];
+  if (!t) return;
+  ensureTaskStructure(t);
+  const defaultDate = t.dueDate || getDefaultDateForMonth(mi);
+  const hasReminder = Boolean(t.reminder);
+
+  openModal(`
+    <div class="eyebrow">${months[mi].toUpperCase()} · КАРТОЧКА ЖЕЛАНИЯ</div>
+    <h3 style="margin-top:4px">${esc(t.text)}</h3>
+    ${t.goal ? `<div style="margin-bottom:10px"><span class="tag">${esc(t.goal)}</span></div>` : ''}
+    <div class="field">
+      <label>Название цели или задачи</label>
+      <input type="text" id="editTaskTitle" value="${esc(t.text)}">
+    </div>
+    <div class="field">
+      <label>Дата выполнения</label>
+      <input type="date" id="editTaskDate" value="${esc(t.dueDate || '')}" placeholder="${defaultDate}">
+    </div>
+    <div class="field">
+      <label>3 первых шага</label>
+      <input type="text" id="editStep0" value="${esc(t.steps[0].text)}" placeholder="Шаг 1..." style="margin-bottom:6px">
+      <input type="text" id="editStep1" value="${esc(t.steps[1].text)}" placeholder="Шаг 2..." style="margin-bottom:6px">
+      <input type="text" id="editStep2" value="${esc(t.steps[2].text)}" placeholder="Шаг 3...">
+    </div>
+    <div class="field">
+      <label>Заметка</label>
+      <textarea id="editTaskNote" placeholder="Детали, идеи, ссылки...">${esc(t.note || '')}</textarea>
+    </div>
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--ink);font-size:13px">
+        <input type="checkbox" id="editTaskRemindToggle" ${hasReminder ? 'checked' : ''} style="width:17px;height:17px;accent-color:var(--gold)">
+        Включить напоминание
+      </label>
+      <div id="reminderTimeWrap" style="margin-top:8px;display:${hasReminder ? 'block' : 'none'}">
+        <label>Время напоминания</label>
+        <input type="time" id="editTaskTime" value="${esc(t.reminder || '10:00')}">
+      </div>
+    </div>
+    <div class="between" style="margin-top:16px">
+      <button type="button" class="btn secondary sm" data-action="download-ics" data-index="${mi}:${ti}">📅 В календарь (.ics)</button>
+      <div class="row">
+        <button type="button" class="btn secondary" data-action="close-modal">Отмена</button>
+        <button type="button" class="btn gold" data-action="save-task-detail" data-index="${mi}:${ti}">Сохранить</button>
+      </div>
+    </div>
+  `);
+
+  const tog = document.getElementById('editTaskRemindToggle');
+  if (tog) {
+    tog.onchange = () => {
+      const wrap = document.getElementById('reminderTimeWrap');
+      if (wrap) wrap.style.display = tog.checked ? 'block' : 'none';
+      if (tog.checked && !document.getElementById('editTaskDate').value) {
+        document.getElementById('editTaskDate').value = defaultDate;
+      }
+      if (tog.checked && 'Notification' in window && Notification.permission === 'default') {
+        try { Notification.requestPermission(); } catch (e) {}
+      }
+    };
+  }
+}
+
+function openNewSquareModal(mi) {
+  openModal(`
+    <div class="eyebrow">${months[mi].toUpperCase()} · НОВЫЙ КВАДРАТИК</div>
+    <h3 style="margin-top:4px">Добавить желание или задачу</h3>
+    <div class="field">
+      <label>Что хочу осуществить?</label>
+      <input type="text" id="modalNewTitle" placeholder="Например: поездка к морю или запуск проекта">
+    </div>
+    <div class="formgrid">
+      <div class="field">
+        <label>Дата выполнения</label>
+        <input type="date" id="modalNewDate" value="${getDefaultDateForMonth(mi)}">
+      </div>
+      <div class="field">
+        <label>Связать с целью</label>
+        <select id="modalNewGoal"><option value="">Без привязки</option>${data.goals.map(g => `<option>${esc(g.title)}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="field">
+      <label>3 первых шага (можно заполнить позже)</label>
+      <input type="text" id="modalNewStep0" placeholder="1. Первый маленький шаг..." style="margin-bottom:6px">
+      <input type="text" id="modalNewStep1" placeholder="2. Второй шаг..." style="margin-bottom:6px">
+      <input type="text" id="modalNewStep2" placeholder="3. Третий шаг...">
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:16px">
+      <button type="button" class="btn secondary" data-action="close-modal">Отмена</button>
+      <button type="button" class="btn gold" data-action="create-square-task" data-index="${mi}">Добавить квадратик</button>
+    </div>
+  `);
+}
+
+function openAuthModal(mode = 'login') {
+  openModal(`
+    <div class="eyebrow">ОБЛАЧНЫЙ АККАУНТ</div>
+    <h3 style="margin-top:4px">${mode === 'login' ? 'Вход в планировщик' : 'Регистрация аккаунта'}</h3>
+    <p class="muted" style="margin-bottom:14px">Создай аккаунт с почтой и паролем, чтобы открывать свой план с любого телефона или компьютера.</p>
+    <div class="tabs">
+      <button type="button" class="${mode === 'login' ? 'active' : ''}" data-action="auth-tab" data-mode="login" style="white-space:nowrap">Войти</button>
+      <button type="button" class="${mode === 'register' ? 'active' : ''}" data-action="auth-tab" data-mode="register" style="white-space:nowrap">Зарегистрироваться</button>
+    </div>
+    <div class="field"><label>Электронная почта (Email)</label><input type="email" id="authEmail" placeholder="name@example.com" autocomplete="email"></div>
+    <div class="field"><label>Пароль</label><input type="password" id="authPass" placeholder="Минимум 4 символа" autocomplete="current-password"></div>
+    <div id="authError" style="color:#a84a3f;font-size:12px;min-height:18px;margin-top:4px"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
+      <button type="button" class="btn secondary" data-action="close-modal" style="white-space:nowrap">Отмена</button>
+      <button type="button" class="btn gold" data-action="submit-auth" data-mode="${mode}" style="white-space:nowrap">${mode === 'login' ? 'Войти' : 'Зарегистрироваться'}</button>
+    </div>
+  `);
+}
+
+async function handleAuthSubmit(mode) {
+  const emailEl = document.getElementById('authEmail');
+  const passEl = document.getElementById('authPass');
+  const errEl = document.getElementById('authError');
+  const email = (emailEl.value || '').trim().toLowerCase();
+  const pass = (passEl.value || '').trim();
+
+  if (!email || !email.includes('@')) {
+    errEl.textContent = 'Введи корректный email';
+    return;
+  }
+  if (pass.length < 4) {
+    errEl.textContent = 'Пароль должен быть не короче 4 символов';
+    return;
+  }
+  if (!sb) {
+    errEl.textContent = 'Нет подключения к облачной базе';
+    return;
+  }
+
+  errEl.textContent = 'Проверяем данные...';
+  const cloudId = 'email_' + email;
+  const passHash = await hashPassword(pass);
+
+  try {
+    const { data: row, error } = await sb
+      .from('user_plans')
+      .select('data')
+      .eq('telegram_id', cloudId)
+      .maybeSingle();
+
+    if (error) {
+      errEl.textContent = 'Ошибка соединения с базой';
+      return;
+    }
+
+    if (mode === 'register') {
+      if (row && row.data && row.data._auth_hash) {
+        errEl.textContent = 'Этот email уже зарегистрирован. Переключись на вкладку «Войти».';
+        return;
+      }
+      savedAccount = { email, hash: passHash };
+      localStorage.setItem(ACCOUNT_KEY, JSON.stringify(savedAccount));
+      await pushToCloud();
+      closeModal();
+      render();
+      toast('Аккаунт создан и синхронизирован!');
+    } else {
+      if (!row || !row.data) {
+        errEl.textContent = 'Аккаунт с таким email не найден. Нажми «Регистрация».';
+        return;
+      }
+      if (row.data._auth_hash && row.data._auth_hash !== passHash) {
+        errEl.textContent = 'Неверный пароль';
+        return;
+      }
+      savedAccount = { email, hash: row.data._auth_hash || passHash };
+      localStorage.setItem(ACCOUNT_KEY, JSON.stringify(savedAccount));
+      const remoteData = { ...row.data };
+      delete remoteData._auth_hash;
+      data = { ...blank(), ...remoteData };
+      if (!data.year || data.year < 2027) data.year = 2027;
+      data.wheelActions ??= {};
+      data.wheelScheduled ??= {};
+      syncGoalsToMonths();
+      localStorage.setItem(KEY, JSON.stringify(data));
+      setSyncLabel(email);
+      closeModal();
+      render();
+      toast('С возвращением! Данные загружены.');
+    }
+  } catch (e) {
+    errEl.textContent = 'Не удалось выполнить вход';
+  }
+}
+
+function logoutAccount() {
+  savedAccount = null;
+  localStorage.removeItem(ACCOUNT_KEY);
+  setSyncLabel(telegramUserId ? 'Telegram ✓' : 'Войти в облако');
+  render();
+  toast('Ты вышла из аккаунта');
+}
+
+function renderWheelFocusBlock() {
+  const lowSpheres = spheres
+    .map((name, i) => ({ name, idx: i, score: data.ratings[i] }))
+    .filter(x => x.score < 5);
+
+  if (!lowSpheres.length) {
+    return `<div class="empty" style="margin-top:16px">Все сферы оценены на 5 и выше. Если захочешь усилить любую из них — просто сдвинь ползунок ниже 5, и здесь появятся поля для 3 конкретных шагов.</div>`;
+  }
+
+  data.wheelActions ??= {};
+  return `
+    ${head('Сферы, требующие внимания (оценка ниже 5)', 'Запиши по 3 конкретных действия для каждой сферы, чтобы в следующем году её оценка стала выше. Все пункты автоматически появятся в разделе «Мой год» во «Входящих».')}
+    ${lowSpheres.map(item => {
+      const steps = data.wheelActions[item.idx] || ['', '', ''];
+      return `
+      <div class="focus-card">
+        <div>
+          <span class="tag warn">Оценка: ${item.score} из 10</span>
+          <h3 style="font:19px Georgia,serif;margin:10px 0 4px">${item.name}</h3>
+          <p class="muted">Что ты сделаешь в ${data.year} году, чтобы поднять эту сферу?</p>
+        </div>
+        <div class="focus-steps">
+          ${[0, 1, 2].map(stepIdx => `
+            <div class="focus-step-row">
+              <span>${stepIdx + 1}.</span>
+              <input type="text" data-wheel-step="${item.idx}:${stepIdx}" value="${esc(steps[stepIdx] || '')}" placeholder="Шаг ${stepIdx + 1} для роста в этой сфере...">
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+    <div style="margin-top:12px">
+      <button type="button" class="btn gold" data-action="save-wheel-steps">Сохранить шаги во «Входящие»</button>
+    </div>
+  `;
+}
+
+function renderMonthDetailPage(i) {
+  const arr = data.monthly[i] || [];
+  arr.forEach(t => ensureTaskStructure(t));
+  const doneCount = arr.filter(x => x.done).length;
+
+  return `
+    <div class="${visionBoardScreenshotMode ? 'board-mode' : ''}">
+      <div class="board-header-banner">
+        <div class="eyebrow">КАРТА ЖЕЛАНИЙ · ${data.year}</div>
+        <h2 style="font:28px Georgia,serif;font-weight:400;margin:4px 0">${months[i]}</h2>
+      </div>
+
+      <div class="between hide-in-board" style="margin-bottom:14px">
+        <button type="button" class="btn secondary" data-action="back-to-months">← Все месяцы</button>
+        <div class="row">
+          <button type="button" class="btn secondary sm" data-action="toggle-board-mode">📱 Режим карты желаний (для скриншота)</button>
+        </div>
+      </div>
+
+      ${visionBoardScreenshotMode ? `
+        <div style="text-align:center;margin-bottom:12px">
+          <button type="button" class="btn secondary sm" data-action="toggle-board-mode">✕ Выйти из режима скриншота</button>
+        </div>
+      ` : ''}
+
+      <div class="sectionhead hide-in-board" style="margin-top:8px">
+        <div>
+          <div class="eyebrow">${data.year} ГОД · КАРТА МЕСЯЦА</div>
+          <h2>${months[i]}</h2>
+          <p>Добавляй фото через +, дату выполнения и 3 первых шага. Нажми «Режим карты желаний», чтобы сделать скриншот на заставку телефона.</p>
+        </div>
+        <div class="row">
+          <span class="tag">${doneCount}/${arr.length} выполнено</span>
+          <button type="button" class="btn gold" data-action="open-new-square" data-index="${i}">+ Добавить квадратик</button>
+        </div>
+      </div>
+
+      <div class="vision-grid">
+        ${arr.map((t, j) => `
+          <div class="vision-card ${t.done ? 'is-done' : ''}">
+            <div class="vision-photo" data-action="pick-card-photo" data-index="${i}:${j}" title="Нажми, чтобы добавить или заменить фото">
+              ${t.photo ? `
+                <img src="${t.photo}" alt="${esc(t.text)}">
+                <button type="button" class="vision-photo-del hide-in-board" data-action="remove-card-photo" data-index="${i}:${j}" title="Удалить фото">×</button>
+              ` : `
+                <div class="vision-plus">
+                  <div class="vision-plus-circle">+</div>
+                  <span>Добавить фото</span>
+                </div>
+              `}
+              ${t.goal ? `<div class="vision-photo-badge">${esc(t.goal)}</div>` : ''}
+            </div>
+
+            <div class="vision-body">
+              <div class="vision-head">
+                <input type="checkbox" ${t.done ? 'checked' : ''} data-toggle-task="${i}:${j}">
+                <div class="vision-title" data-action="open-task-detail" data-index="${i}:${j}" style="${t.done ? 'text-decoration:line-through;color:#8c8a82' : ''}">${esc(t.text)}</div>
+              </div>
+
+              <div class="vision-date-bar">
+                <span>📅 ${t.dueDate ? formatRuDate(t.dueDate) : 'Дата:'}</span>
+                <input type="date" class="vision-date-input hide-in-board" data-card-date="${i}:${j}" value="${esc(t.dueDate || '')}">
+              </div>
+
+              <div class="vision-steps">
+                ${[0, 1, 2].map(si => `
+                  <div class="vision-step">
+                    <input type="checkbox" ${t.steps[si].done ? 'checked' : ''} data-card-step-done="${i}:${j}:${si}">
+                    <span class="num">${si + 1}.</span>
+                    <input type="text" data-card-step-text="${i}:${j}:${si}" value="${esc(t.steps[si].text)}" placeholder="Шаг ${si + 1}..." style="${t.steps[si].done ? 'text-decoration:line-through;color:#999' : ''}">
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="vision-foot hide-in-board">
+                <button type="button" class="btn secondary sm" data-action="open-task-detail" data-index="${i}:${j}" style="padding:4px 9px;font-size:11px">✎ Заметка и напоминание</button>
+                <button type="button" class="del" data-action="del-task" data-index="${i}:${j}" style="font-size:18px;padding:0 6px" title="Удалить">×</button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+
+        <div class="vision-add-card hide-in-board" data-action="open-new-square" data-index="${i}">
+          <div class="vision-plus-circle" style="width:52px;height:52px;font-size:28px">+</div>
+          <strong style="font:16px Georgia,serif;color:var(--ink)">Новое желание / задача</strong>
+          <span class="muted">Добавить квадратик в ${months[i].toLowerCase()}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+const pages = {
+  home: () => {
+    const complete = [
+      Object.values(data.review).filter(Boolean).length > 0,
+      data.ratings.some(x => x !== 5),
+      Object.values(data.future).some(Boolean),
+      data.goals.length > 0,
+      Object.values(data.monthly).some(a => a && a.length),
+      data.hobbies.length > 0
+    ].filter(Boolean).length;
+
+    const startMonthTasks = data.monthly[startMonthIdx] || [];
+    const startMonthDone = startMonthTasks.filter(x => x.done).length;
+
+    const userName = savedAccount
+      ? `, ${esc(savedAccount.email.split('@')[0])}`
+      : (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name
+        ? `, ${esc(tg.initDataUnsafe.user.first_name)}`
+        : '');
+
+    return `
+<section class="hero">
+  <div class="eyebrow">ТВОЁ ЛИЧНОЕ ПРОСТРАНСТВО${userName.toUpperCase()}</div>
+  <h1>Твой ${data.year} год начинается<br>с твоего решения.</h1>
+  <p>Здесь ты собираешь всё, что хочешь изменить, попробовать и прожить. Не идеальный план, а твой собственный маршрут на ${data.year} год.</p>
+  <div class="hero-actions">
+    <button type="button" class="btn gold" data-nav="review">Начать планирование →</button>
+    <button type="button" class="btn secondary" data-nav="months">Мой год</button>
+  </div>
+</section>
+
+<div class="current-banner">
+  <div class="between">
+    <div>
+      <div class="eyebrow">СТАРТ ГОДА · ${months[startMonthIdx].toUpperCase()} ${data.year}</div>
+      <h3 style="font:22px Georgia,serif;font-weight:400;margin:4px 0 2px">Что запланировано на ${months[startMonthIdx].toLowerCase()} ${data.year}</h3>
+      <p class="muted">${startMonthTasks.length ? `Выполнено ${startMonthDone} из ${startMonthTasks.length}. Нажми, чтобы открыть карту желаний и 3 первых шага.` : `На ${months[startMonthIdx].toLowerCase()} ${data.year} пока ничего не добавлено — начни с первых квадратиков желаний.`}</p>
+    </div>
+    <button type="button" class="btn gold" data-action="open-month-page" data-index="${startMonthIdx}">Открыть ${months[startMonthIdx].toLowerCase()} →</button>
+  </div>
+  ${startMonthTasks.length ? `
+    <ul class="current-preview-list">
+      ${startMonthTasks.slice(0, 4).map(t => `
+        <li>
+          <span style="color:${t.done ? 'var(--sage)' : 'var(--gold)'}">${t.done ? '✓' : '○'}</span>
+          <span style="${t.done ? 'text-decoration:line-through;color:var(--muted)' : ''}">${esc(t.text)}</span>
+          ${t.dueDate ? `<span class="tag date">📅 ${formatRuDate(t.dueDate)}</span>` : ''}
+        </li>
+      `).join('')}
+      ${startMonthTasks.length > 4 ? `<li class="muted" style="font-size:12px">И ещё ${startMonthTasks.length - 4}...</li>` : ''}
+    </ul>
+  ` : ''}
+</div>
+
+${!savedAccount ? `<div class="auth-banner">
+  <div>
+    <strong style="font:16px Georgia,serif;display:block">Сохрани свой план в облаке</strong>
+    <span class="muted">Зарегистрируйся по email, чтобы данные не потерялись и открывались на любом устройстве.</span>
+  </div>
+  <div class="row">
+    <button type="button" class="btn gold" data-action="open-auth" data-mode="register">Регистрация</button>
+    <button type="button" class="btn secondary" data-action="open-auth" data-mode="login">Войти</button>
+  </div>
+</div>` : ''}
+
+<div class="stats">
+  <div class="stat"><strong>${data.goals.length}</strong><span>целей записано</span></div>
+  <div class="stat"><strong>${data.hobbies.length}</strong><span>новых впечатлений</span></div>
+  <div class="stat"><strong>${complete}/6</strong><span>этапов начато</span></div>
+</div>
+
+${head('Твой маршрут', 'Проходи этапы в своём темпе. Все записи сохраняются автоматически.')}
+<div class="grid">${[
+  ['review', '01', 'Итоги года', 'Остановиться, оглянуться и забрать важное.'],
+  ['wheel', '02', 'Колесо баланса', 'Посмотреть, как сейчас распределено внимание.'],
+  ['future', '03', 'Путешествие в будущее', 'Представить свою жизнь через год.'],
+  ['hobbies', '04', 'Хочу попробовать', 'Оставить место любопытству и новым увлечениям.'],
+  ['goals', '05', 'Желания и цели', 'Записать, чего хочется в каждой сфере.'],
+  ['months', '06', 'Мой год', 'Превратить желания в карту 12 месяцев и шаги.']
+].map(x => `<div class="tile" data-nav="${x[0]}"><div class="num">${x[1]}</div><h3>${x[2]}</h3><p>${x[3]}</p></div>`).join('')}</div>
+${head('Небольшое напоминание', 'План — это компас, а не клетка. Его можно менять вместе с жизнью.')}`;
+  },
+
+  review: () => `${head('Итоги года', 'Сначала замечаем, что уже произошло. Не обесценивай маленькие победы.')}
+<div class="panel">
+  <div class="field"><label>Три главных события года</label><textarea data-review="events" placeholder="Что особенно запомнилось?">${esc(data.review.events)}</textarea></div>
+  <div class="field"><label>Чем я горжусь?</label><textarea data-review="proud" placeholder="Даже если это было непросто...">${esc(data.review.proud)}</textarea></div>
+  <div class="field"><label>Какие цели и желания удалось реализовать?</label><textarea data-review="achieved">${esc(data.review.achieved)}</textarea></div>
+  <div class="field"><label>Что не получилось? Почему?</label><textarea data-review="notdone">${esc(data.review.notdone)}</textarea></div>
+  <div class="field"><label>Какие уроки я забираю с собой?</label><textarea data-review="lessons">${esc(data.review.lessons)}</textarea></div>
+  <div class="field"><label>Что я хочу оставить в прошлом году?</label><textarea data-review="leave">${esc(data.review.leave)}</textarea></div>
+  <button type="button" class="btn gold" data-action="save-fields" data-group="review">Сохранить итоги</button>
+</div>`,
+
+  wheel: () => `${head('Колесо баланса', 'Оцени каждую сферу по шкале от 1 до 10. Сферы с оценкой ниже 5 появятся ниже как требующие внимания.')}
+<div class="panel wheelwrap">
+  <div>
+    <svg id="wheelSvg" class="wheel" viewBox="0 0 360 360"></svg>
+    <p class="muted" style="text-align:center;margin-top:8px">Шкала от 1 до 10 · Диаграмма обновляется автоматически</p>
+  </div>
+  <div>
+    ${spheres.map((s, i) => `<div class="rangeRow">
+      <div>
+        <label>${i + 1}. ${s}</label>
+        <input type="range" min="1" max="10" step="1" value="${data.ratings[i]}" data-rating="${i}">
+        <div class="rangeLabels"><span>1</span><span>5</span><span>10</span></div>
+      </div>
+      <strong id="rate${i}" style="color:${data.ratings[i] < 5 ? '#a84a3f' : 'inherit'}">${data.ratings[i]}/10</strong>
+    </div>`).join('')}
+    <div class="field"><label>Общие наблюдения по колесу баланса</label><textarea data-wheel="priority" placeholder="Запиши свои наблюдения...">${esc(data.wheelPriority)}</textarea></div>
+    <button type="button" class="btn gold" data-action="save-fields" data-group="wheel">Сохранить колесо</button>
+  </div>
+</div>
+<div id="wheelFocusSection">${renderWheelFocusBlock()}</div>`,
+
+  future: () => `${head('Путешествие в будущее', `Представь, что сегодня 31 декабря ${data.year} года. Ты оглядываешься на прожитый год. Каким он стал?`)}
+<div class="hero" style="margin-bottom:14px">
+  <div class="eyebrow">НЕ СПЕШИ. ПРЕДСТАВЬ.</div>
+  <h1 style="font-size:27px">Ты уже там. Это твой декабрь.</h1>
+  <p>Можно включить спокойную музыку, закрыть глаза и представить обычный день своей будущей жизни. Затем возвращайся и записывай то, что увидела.</p>
+</div>
+<div class="panel">
+  ${[
+    ['place', 'Где ты живёшь и как выглядит твоё пространство?'],
+    ['day', 'Как проходит твой обычный день?'],
+    ['work', 'Чем ты занимаешься и как зарабатываешь?'],
+    ['people', 'Кто рядом с тобой? Какие у тебя отношения с близкими?'],
+    ['body', 'Как ты себя чувствуешь? Как заботишься о себе?'],
+    ['joy', 'Что нового и радостного появилось в твоей жизни?'],
+    ['proud', 'За что ты благодарна себе в этом году?'],
+    ['word', 'Одним словом: каким был твой год?']
+  ].map(([k, l]) => `<div class="field"><label>${l}</label><textarea data-future="${k}" placeholder="Опиши свою картину...">${esc(data.future[k])}</textarea></div>`).join('')}
+  <button type="button" class="btn gold" data-action="save-fields" data-group="future">Сохранить моё будущее</button>
+</div>`,
+
+  goals: () => `${head('Мои желания и цели', 'Записывай важное по сферам. Если выбрать месяц, цель сразу попадёт в план этого месяца.')}
+<div class="panel">
+  <div class="formgrid">
+    <div class="field"><label>Жизненная сфера</label><select id="goalSphere">${spheres.map((s, i) => `<option value="${i}">${s}</option>`).join('')}</select></div>
+    <div class="field"><label>Тип</label><select id="goalType"><option>Цель</option><option>Мечта</option><option>Изменение</option></select></div>
+  </div>
+  <div class="field"><label>Чего я хочу?</label><input id="goalTitle" placeholder="Например: пробежать полумарафон"></div>
+  <div class="field"><label>Почему это важно для меня?</label><textarea id="goalWhy" placeholder="Что изменится, когда это произойдёт?"></textarea></div>
+  <div class="formgrid">
+    <div class="field"><label>Как пойму, что получилось?</label><input id="goalResult" placeholder="Измеримый результат"></div>
+    <div class="field"><label>Желаемый месяц результата</label><select id="goalMonth"><option value="">Пока не знаю</option>${months.map((m, i) => `<option value="${i}">${m}</option>`).join('')}</select></div>
+  </div>
+  <button type="button" class="btn gold" data-action="add-goal">Добавить в мой список</button>
+</div>
+${head('Мой список', 'Нажми «+ Шаг в план месяца», чтобы добавить конкретное действие.')}
+${data.goals.length ? data.goals.map((g, i) => `<div class="panel item" style="margin-bottom:12px">
+  <div class="between">
+    <div><span class="tag">${spheres[g.sphere]}</span> <span class="tag">${g.type}</span>${g.month !== '' && g.month !== undefined ? ` <span class="tag">Ориентир: ${months[+g.month]}</span>` : ''}</div>
+    <button type="button" class="del" data-action="confirm-del-goal" data-index="${i}">×</button>
+  </div>
+  <h3 style="font:20px Georgia,serif;margin:9px 0">${esc(g.title)}</h3>
+  ${g.why ? `<p class="muted">${esc(g.why)}</p>` : ''}
+  ${g.result ? `<p class="muted" style="margin-top:4px">Критерий: ${esc(g.result)}</p>` : ''}
+  <div class="row" style="margin-top:12px">
+    <button type="button" class="btn secondary" data-action="open-goal-modal" data-index="${i}">+ Шаг в план месяца</button>
+    <span class="muted">${(g.tasks || []).length} шагов</span>
+  </div>
+</div>`).join('') : '<div class="empty">Здесь появятся твои цели и мечты.</div>'}`,
+
+  vision: () => {
+    const photos = [];
+    for (let mi = 0; mi < 12; mi++) {
+      const arr = data.monthly[mi] || [];
+      arr.forEach((t, ti) => {
+        if (t && t.photo) {
+          ensureTaskStructure(t);
+          photos.push({ mi, ti, monthName: months[mi], task: t });
+        }
+      });
+    }
+
+    const layoutOffsets = [
+      { rot: -3.4, tx: -3, ty: 2, z: 3 },
+      { rot: 2.8, tx: 4, ty: -4, z: 4 },
+      { rot: -1.9, tx: -2, ty: 5, z: 2 },
+      { rot: 3.7, tx: 3, ty: -2, z: 5 },
+      { rot: -2.6, tx: -4, ty: -3, z: 3 },
+      { rot: 1.8, tx: 2, ty: 4, z: 4 },
+      { rot: -4.1, tx: -2, ty: 3, z: 2 },
+      { rot: 2.3, tx: 4, ty: -3, z: 3 }
+    ];
+
+    return `
+      <div class="${visionBoardScreenshotMode ? 'board-mode' : ''}">
+        <div class="board-header-banner">
+          <div class="eyebrow">МОЯ КАРТА ЖЕЛАНИЙ</div>
+          <h2 style="font:28px Georgia,serif;font-weight:400;margin:4px 0">${data.year} ГОД</h2>
+        </div>
+
+        ${visionBoardScreenshotMode ? `
+          <div style="text-align:center;margin-bottom:12px">
+            <button type="button" class="btn secondary sm" data-action="toggle-board-mode">✕ Выйти из режима скриншота</button>
+          </div>
+        ` : ''}
+
+        ${head('Карта желаний', 'Сюда автоматически подтягиваются все фотографии из твоих желаний разных месяцев — как живые снимки, разложенные на столе.',
+          photos.length ? `<button type="button" class="btn secondary sm hide-in-board" data-action="toggle-board-mode">📱 Режим скриншота (на заставку)</button>` : ''
+        )}
+
+        ${photos.length ? `
+          <div class="year-collage">
+            ${photos.map((item, idx) => {
+              const t = item.task;
+              const filledSteps = (t.steps || []).filter(s => s.text && s.text.trim());
+              const off = layoutOffsets[idx % layoutOffsets.length];
+              return `
+                <div class="polaroid-card" style="--rot:${off.rot}deg;--tx:${off.tx}px;--ty:${off.ty}px;--z:${off.z}" data-action="open-month-page" data-index="${item.mi}" title="Открыть ${item.monthName}">
+                  <div class="polaroid-photo-wrap">
+                    <img src="${t.photo}" alt="${esc(t.text)}">
+                    <div class="polaroid-month-pin">${item.monthName}</div>
+                  </div>
+                  <div class="polaroid-caption-area">
+                    <div class="polaroid-title">${esc(t.text)}</div>
+                    ${t.dueDate ? `<div class="polaroid-meta">📅 ${formatRuDate(t.dueDate)}</div>` : ''}
+                    ${filledSteps.length ? `
+                      <div class="polaroid-steps-mini">
+                        ${filledSteps.map((st, si) => `<div>${st.done ? '✓' : '·'} ${esc(st.text)}</div>`).join('')}
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : `
+          <div class="panel" style="text-align:center;padding:34px 20px">
+            <div style="font-size:32px;margin-bottom:8px">🖼</div>
+            <h3 style="font:20px Georgia,serif;font-weight:400;margin:0 0 6px">Твоя карта желаний пока ждёт первые снимки</h3>
+            <p class="muted" style="max-width:460px;margin:0 auto 16px">Открой любой месяц в разделе «Мой год» и нажми <strong>+</strong> на квадратике желания, чтобы загрузить картинку — она сразу появится здесь.</p>
+            <button type="button" class="btn gold" data-nav="months">Перейти в «Мой год» →</button>
+          </div>
+        `}
+      </div>
+    `;
+  },
+
+  months: () => {
+    if (monthViewMode === 'detail') {
+      return renderMonthDetailPage(activeMonth);
+    }
+
+    const unscheduled = getUnscheduledItems();
+    return `${head('Мой год · 12 месяцев', 'Нажми на любой месяц, чтобы открыть его страницу с квадратиками желаний, фото и первыми шагами.')}
+<div class="months">${months.map((m, i) => {
+  const arr = data.monthly[i] || [];
+  const photosCount = arr.filter(x => x.photo).length;
+  return `<div class="month ${activeMonth === i ? 'selected' : ''}" id="monthCard${i}" data-action="open-month-page" data-index="${i}">
+    <div class="between" style="align-items:baseline">
+      <strong>${m}</strong>
+      ${photosCount ? `<span class="tag" style="font-size:10px;padding:2px 7px">🖼 ${photosCount}</span>` : ''}
+    </div>
+    <small>${arr.filter(x => x.done).length}/${arr.length} выполнено</small>
+    <div class="progress"><i style="width:${arr.length ? 100 * arr.filter(x => x.done).length / arr.length : 0}%"></i></div>
+  </div>`;
+}).join('')}</div>
+
+${head('Входящие · Пока не установлен срок', 'Сюда автоматически подтягиваются шаги из «Колеса баланса» (с оценкой ниже 5) и идеи без даты из «Хочу попробовать». Назначь им месяц — и пункт перенесётся туда.')}
+<div class="panel">
+  ${unscheduled.length ? unscheduled.map(item => `
+    <div class="between item">
+      <div>
+        <span class="tag">${esc(item.badge)}</span>
+        <div style="margin-top:6px;font-size:14px">${esc(item.text)}</div>
+        ${item.sub ? `<div class="muted" style="font-size:12px;margin-top:2px">${esc(item.sub)}</div>` : ''}
+      </div>
+      <div class="row">
+        <select data-assign-inbox="${esc(item.uid)}" style="background:#fffefa;border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13px">
+          <option value="">Выбрать месяц...</option>
+          ${months.map((m, mi) => `<option value="${mi}">${m}</option>`).join('')}
+        </select>
+        <button type="button" class="del" title="Убрать из входящих" data-action="dismiss-inbox" data-uid="${esc(item.uid)}">×</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty">Во входящих пока пусто. Новые идеи без даты из «Хочу попробовать» и шаги из «Колеса баланса» появятся здесь.</div>'}
+</div>`;
+  },
+
+  hobbies: () => `${head('Хочу попробовать!', 'Не всё в жизни должно быть целью. Оставь место экспериментам, интересу и удовольствию.')}
+<div class="panel">
+  <div class="field"><label>Что хочется попробовать?</label><input id="hobbyTitle" placeholder="Например: урок верховой езды"></div>
+  <div class="formgrid">
+    <div class="field"><label>Почему мне это интересно?</label><input id="hobbyWhy" placeholder="Давно мечтала..."></div>
+    <div class="field"><label>Когда хотелось бы попробовать?</label><select id="hobbyMonth"><option value="">Пока не знаю (попадёт во входящие)</option>${months.map((m, i) => `<option value="${i}">${m}</option>`).join('')}</select></div>
+  </div>
+  <div class="field"><label>Первый маленький шаг</label><input id="hobbyStep" placeholder="Найти студию, узнать расписание..."></div>
+  <button type="button" class="btn gold" data-action="add-hobby">Добавить в список</button>
+</div>
+${head('Моя коллекция впечатлений', 'Отмечай, что уже попробовала — даже если решила, что это не твоё.')}
+${data.hobbies.length ? data.hobbies.map((h, i) => `<div class="panel item" style="margin-bottom:12px">
+  <div class="between">
+    <div><span class="tag">${h.month === '' || h.month === undefined ? 'Во входящих (без даты)' : months[+h.month]}</span> <span class="tag">${h.done ? 'Попробовала ✓' : 'Хочу попробовать'}</span></div>
+    <button type="button" class="del" data-action="del-hobby" data-index="${i}">×</button>
+  </div>
+  <div class="between">
+    <h3 style="font:19px Georgia,serif;margin:8px 0">${esc(h.title)}</h3>
+    <button type="button" class="btn secondary" data-action="toggle-hobby" data-index="${i}">${h.done ? 'Вернуть в список' : 'Я попробовала!'}</button>
+  </div>
+  <p class="muted">${esc(h.why)}${h.step ? ' · Первый шаг: ' + esc(h.step) : ''}</p>
+</div>`).join('') : '<div class="empty">Твоя коллекция новых впечатлений пока пуста. Это легко исправить.</div>'}`,
+
+  settings: () => `${head('Аккаунт и данные', 'Синхронизация между устройствами и резервная копия записей.')}
+<div class="panel">
+  <h3 style="font:20px Georgia,serif;margin:0 0 6px">Облачный аккаунт</h3>
+  ${savedAccount ? `
+    <p class="muted">Ты вошла как <strong>${esc(savedAccount.email)}</strong>. Все изменения автоматически сохраняются в облаке и доступны с любого устройства.</p>
+    <div class="row" style="margin-top:12px">
+      <button type="button" class="btn secondary" data-action="sync-now">Обновить из облака</button>
+      <button type="button" class="btn danger" data-action="logout">Выйти из аккаунта</button>
+    </div>
+  ` : `
+    <p class="muted">${telegramUserId ? 'Сейчас записи привязаны только к твоему Telegram ID. Зарегистрируйся по email, чтобы открывать свой план ещё и в обычном браузере с любого компьютера.' : 'Зарегистрируйся по email и паролю, чтобы сохранить свой план в облаке и заходить с любого устройства.'}</p>
+    <div class="row" style="margin-top:12px">
+      <button type="button" class="btn gold" data-action="open-auth" data-mode="register">Зарегистрироваться</button>
+      <button type="button" class="btn secondary" data-action="open-auth" data-mode="login">Войти в аккаунт</button>
+    </div>
+  `}
+  <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+  <div class="field"><label>Год планирования</label><input type="number" id="planYear" min="2024" max="2100" value="${data.year}"></div>
+  <button type="button" class="btn gold" data-action="change-year">Сохранить год</button>
+  <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+  <h3 style="font:20px Georgia,serif;margin:0 0 6px">Резервная копия (JSON)</h3>
+  <p class="muted">Скачай файл со своими данными, чтобы хранить его отдельно.</p>
+  <div class="row" style="margin-top:12px">
+    <button type="button" class="btn secondary" data-action="export-data">Скачать мои данные</button>
+    <label class="btn secondary" style="cursor:pointer">Импортировать<input type="file" id="importFileInput" accept="application/json" hidden></label>
+  </div>
+</div>`
+};
+
+function wire() {
+  if (page === 'wheel') drawWheel();
+  const imp = document.getElementById('importFileInput');
+  if (imp) imp.onchange = importData;
+}
+
+function saveFields(group) {
+  document.querySelectorAll(`[data-${group}]`).forEach(el => {
+    const k = el.dataset[group];
+    if (group === 'review') data.review[k] = el.value;
+    else if (group === 'future') data.future[k] = el.value;
+    else if (group === 'wheel') data.wheelPriority = el.value;
+  });
+  save(true);
+}
+
+function setRating(i, v) {
+  const prev = data.ratings[i];
+  const next = +v;
+  data.ratings[i] = next;
+  const lbl = document.getElementById('rate' + i);
+  if (lbl) {
+    lbl.textContent = next + '/10';
+    lbl.style.color = next < 5 ? '#a84a3f' : 'inherit';
+  }
+  drawWheel();
+  if ((prev < 5) !== (next < 5)) {
+    const focusBox = document.getElementById('wheelFocusSection');
+    if (focusBox) focusBox.innerHTML = renderWheelFocusBlock();
+  }
+  save(false);
+}
+
+function drawWheel() {
+  const svg = document.getElementById('wheelSvg');
+  if (!svg) return;
+  const cx = 180, cy = 180, r = 135, n = 8, pts = [];
+  for (let j = 0; j < n; j++) {
+    const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+    const rr = r * data.ratings[j] / 10;
+    pts.push([cx + rr * Math.cos(a), cy + rr * Math.sin(a)].join(','));
+  }
+  let s = '';
+  for (let ring = 2; ring <= 10; ring += 2) {
+    const p = [];
+    for (let j = 0; j < n; j++) {
+      const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+      p.push([cx + r * ring / 10 * Math.cos(a), cy + r * ring / 10 * Math.sin(a)].join(','));
+    }
+    s += `<polygon points="${p.join(' ')}" fill="none" stroke="#e5ddcf" stroke-width="1"/>`;
+  }
+  for (let j = 0; j < n; j++) {
+    const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+    s += `<line x1="${cx}" y1="${cy}" x2="${cx + r * Math.cos(a)}" y2="${cy + r * Math.sin(a)}" stroke="#e5ddcf"/>`;
+  }
+  s += `<polygon points="${pts.join(' ')}" fill="rgba(179,148,85,.25)" stroke="#b39455" stroke-width="2"/>`;
+  pts.forEach(p => {
+    const [x, y] = p.split(',');
+    s += `<circle cx="${x}" cy="${y}" r="4.5" fill="#9b7e43"/>`;
+  });
+  s += `<circle cx="${cx}" cy="${cy}" r="3" fill="#9b7e43"/>`;
+  spheres.forEach((v, j) => {
+    const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+    const x = cx + 158 * Math.cos(a);
+    const y = cy + 158 * Math.sin(a);
+    s += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="600" fill="#777">${j + 1}</text>`;
+  });
+  svg.innerHTML = s;
+}
+
+function addGoal() {
+  const title = document.getElementById('goalTitle').value.trim();
+  if (!title) { toast('Напиши, чего ты хочешь'); return; }
+  const monthVal = document.getElementById('goalMonth').value;
+  const goalId = 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  const goalObj = {
+    id: goalId,
+    title,
+    sphere: +document.getElementById('goalSphere').value,
+    type: document.getElementById('goalType').value,
+    why: document.getElementById('goalWhy').value,
+    result: document.getElementById('goalResult').value,
+    month: monthVal,
+    tasks: []
+  };
+  if (monthVal !== '') {
+    const mi = +monthVal;
+    data.monthly[mi] ??= [];
+    const item = { text: title, goal: title, goalId: goalId, autoFromGoal: true, done: false, note: '', dueDate: '', reminder: '' };
+    ensureTaskStructure(item);
+    data.monthly[mi].push(item);
+    goalObj.tasks.push({ month: mi, text: title, done: false });
+  }
+  data.goals.push(goalObj);
+  save();
+  render();
+  if (monthVal !== '') {
+    toast('Цель добавлена в план на ' + months[+monthVal].toLowerCase());
+  }
+}
+
+function confirmDeleteGoal(i) {
+  openModal(`
+    <h3>Удалить цель?</h3>
+    <p class="muted" style="margin-bottom:18px">Цель «${esc(data.goals[i].title)}» будет удалена из списка.</p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn secondary" data-action="close-modal">Отмена</button>
+      <button type="button" class="btn danger" data-action="del-goal" data-index="${i}">Удалить</button>
+    </div>
+  `);
+}
+
+function deleteGoal(i) {
+  const g = data.goals[i];
+  if (g) {
+    Object.keys(data.monthly).forEach(mi => {
+      data.monthly[mi] = (data.monthly[mi] || []).filter(t => !(t.autoFromGoal && ((g.id && t.goalId === g.id) || t.goal === g.title)));
+    });
+  }
+  data.goals.splice(i, 1);
+  closeModal();
+  save();
+  render();
+}
+
+function openGoalActionModal(i) {
+  const g = data.goals[i];
+  openModal(`
+    <div class="eyebrow">ПЛАН ДЕЙСТВИЙ</div>
+    <h3 style="margin-top:4px">${esc(g.title)}</h3>
+    <div class="field"><label>В каком месяце сделать шаг?</label><select id="modalActionMonth">${months.map((m, idx) => `<option value="${idx}" ${String(g.month) === String(idx) ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
+    <div class="field"><label>Какое конкретное действие?</label><input id="modalActionText" placeholder="Например: записаться на пробное занятие"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:16px">
+      <button type="button" class="btn secondary" data-action="close-modal">Отмена</button>
+      <button type="button" class="btn gold" data-action="save-goal-action" data-index="${i}">Добавить в план</button>
+    </div>
+  `);
+}
+
+function saveGoalAction(i) {
+  const text = document.getElementById('modalActionText').value.trim();
+  if (!text) { toast('Напиши действие'); return; }
+  const mi = +document.getElementById('modalActionMonth').value;
+  const g = data.goals[i];
+  g.tasks ??= [];
+  g.tasks.push({ month: mi, text, done: false });
+  data.monthly[mi] ??= [];
+  const item = { text, goal: g.title, done: false, note: '', dueDate: '', reminder: '' };
+  ensureTaskStructure(item);
+  data.monthly[mi].push(item);
+  closeModal();
+  save();
+  render();
+}
+
+function addHobby() {
+  const title = document.getElementById('hobbyTitle').value.trim();
+  if (!title) { toast('Добавь увлечение'); return; }
+  const monthVal = document.getElementById('hobbyMonth').value;
+  const why = document.getElementById('hobbyWhy').value;
+  const step = document.getElementById('hobbyStep').value;
+  const hobbyId = 'h_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+
+  data.hobbies.push({
+    id: hobbyId,
+    title,
+    why,
+    month: monthVal,
+    step,
+    done: false
+  });
+
+  if (monthVal !== '') {
+    const mi = +monthVal;
+    data.monthly[mi] ??= [];
+    const item = {
+      text: title,
+      goal: 'Хочу попробовать',
+      hobbyId,
+      autoFromHobby: true,
+      done: false,
+      note: step ? 'Первый шаг: ' + step : '',
+      dueDate: '',
+      reminder: ''
+    };
+    ensureTaskStructure(item);
+    if (step) item.steps[0].text = step;
+    data.monthly[mi].push(item);
+  }
+
+  save();
+  render();
+  if (monthVal === '') {
+    toast('Добавлено в список и во «Входящие» в разделе «Мой год»');
+  } else {
+    toast('Добавлено в план на ' + months[+monthVal].toLowerCase());
+  }
+}
+
+function changeYear() {
+  const y = +document.getElementById('planYear').value;
+  if (y < 2024 || y > 2100) return;
+  data.year = y;
+  save();
+  render();
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'moi-god-' + data.year + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Файл подготовлен');
+}
+
+function importData(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      data = { ...blank(), ...JSON.parse(r.result) };
+      syncGoalsToMonths();
+      save();
+      render();
+      toast('Данные импортированы');
+    } catch (err) {
+      toast('Не удалось прочитать файл');
+    }
+  };
+  r.readAsText(f);
+}
+
+// Загрузка фото на квадратик карточки желаний
+const cardPhotoEl = document.getElementById('cardPhotoInput');
+if (cardPhotoEl) {
+  cardPhotoEl.onchange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file || !pendingPhotoTarget) return;
+    const { mi, ti } = pendingPhotoTarget;
+    compressImageToDataUrl(file, (dataUrl) => {
+      if (data.monthly[mi] && data.monthly[mi][ti]) {
+        data.monthly[mi][ti].photo = dataUrl;
+        save(false);
+        render();
+        toast('Фото добавлено на карту желаний');
+      }
+      pendingPhotoTarget = null;
+      cardPhotoEl.value = '';
+    });
+  };
+}
+
+// Обработчик кликов
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'modalBackdrop') {
+    closeModal();
+    return;
+  }
+
+  const actEl = e.target.closest('[data-action]');
+  if (actEl) {
+    const action = actEl.dataset.action;
+    const idx = actEl.dataset.index;
+
+    if (action === 'open-auth') openAuthModal(actEl.dataset.mode || (savedAccount ? 'login' : 'register'));
+    else if (action === 'auth-tab') openAuthModal(actEl.dataset.mode);
+    else if (action === 'submit-auth') handleAuthSubmit(actEl.dataset.mode);
+    else if (action === 'logout') logoutAccount();
+    else if (action === 'sync-now') initCloud();
+    else if (action === 'close-modal') closeModal();
+    else if (action === 'save-fields') saveFields(actEl.dataset.group);
+    else if (action === 'save-wheel-steps') {
+      save(true);
+      toast('Шаги сохранены и добавлены во «Входящие» в разделе «Мой год»');
+    }
+    else if (action === 'dismiss-inbox') {
+      const uid = actEl.dataset.uid;
+      if (uid.startsWith('wheel:')) {
+        const key = uid.slice(6);
+        data.wheelScheduled ??= {};
+        data.wheelScheduled[key] = true;
+      } else if (uid.startsWith('hobby:')) {
+        const hid = uid.slice(6);
+        const h = (data.hobbies || []).find(x => x.id === hid);
+        if (h) h._dismissedInbox = true;
+      }
+      save(true);
+      render();
+    }
+    else if (action === 'add-goal') addGoal();
+    else if (action === 'confirm-del-goal') confirmDeleteGoal(+idx);
+    else if (action === 'del-goal') deleteGoal(+idx);
+    else if (action === 'open-goal-modal') openGoalActionModal(+idx);
+    else if (action === 'save-goal-action') saveGoalAction(+idx);
+    else if (action === 'open-month-page') openMonthPage(+idx);
+    else if (action === 'back-to-months') {
+      monthViewMode = 'grid';
+      visionBoardScreenshotMode = false;
+      render();
+    }
+    else if (action === 'toggle-board-mode') {
+      visionBoardScreenshotMode = !visionBoardScreenshotMode;
+      render();
+    }
+    else if (action === 'open-new-square') openNewSquareModal(+idx);
+    else if (action === 'create-square-task') {
+      const mi = +idx;
+      const title = (document.getElementById('modalNewTitle').value || '').trim();
+      if (!title) { toast('Напиши желание или задачу'); return; }
+      const dueDate = document.getElementById('modalNewDate').value || '';
+      const goal = document.getElementById('modalNewGoal').value || '';
+      const s0 = (document.getElementById('modalNewStep0').value || '').trim();
+      const s1 = (document.getElementById('modalNewStep1').value || '').trim();
+      const s2 = (document.getElementById('modalNewStep2').value || '').trim();
+      data.monthly[mi] ??= [];
+      data.monthly[mi].push({
+        text: title,
+        goal,
+        done: false,
+        note: '',
+        dueDate,
+        reminder: '',
+        steps: [
+          { text: s0, done: false },
+          { text: s1, done: false },
+          { text: s2, done: false }
+        ]
+      });
+      closeModal();
+      save(true);
+      render();
+    }
+    else if (action === 'pick-card-photo') {
+      const [mi, ti] = idx.split(':').map(Number);
+      pendingPhotoTarget = { mi, ti };
+      if (cardPhotoEl) cardPhotoEl.click();
+    }
+    else if (action === 'remove-card-photo') {
+      e.stopPropagation();
+      const [mi, ti] = idx.split(':').map(Number);
+      if (data.monthly[mi] && data.monthly[mi][ti]) {
+        delete data.monthly[mi][ti].photo;
+        save(false);
+        render();
+        toast('Фото удалено');
+      }
+    }
+    else if (action === 'open-task-detail') {
+      const [mi, ti] = idx.split(':').map(Number);
+      openTaskDetailModal(mi, ti);
+    }
+    else if (action === 'save-task-detail') {
+      const [mi, ti] = idx.split(':').map(Number);
+      const t = (data.monthly[mi] || [])[ti];
+      if (t) {
+        ensureTaskStructure(t);
+        const newTitle = (document.getElementById('editTaskTitle').value || '').trim();
+        if (newTitle) t.text = newTitle;
+        t.dueDate = document.getElementById('editTaskDate').value || '';
+        t.steps[0].text = (document.getElementById('editStep0').value || '').trim();
+        t.steps[1].text = (document.getElementById('editStep1').value || '').trim();
+        t.steps[2].text = (document.getElementById('editStep2').value || '').trim();
+        t.note = document.getElementById('editTaskNote').value || '';
+        const remOn = document.getElementById('editTaskRemindToggle').checked;
+        if (remOn) {
+          if (!t.dueDate) t.dueDate = getDefaultDateForMonth(mi);
+          t.reminder = document.getElementById('editTaskTime').value || '10:00';
+          t._notified = false;
+        } else {
+          t.reminder = '';
+        }
+        save(true);
+        closeModal();
+        render();
+      }
+    }
+    else if (action === 'download-ics') {
+      const [mi, ti] = idx.split(':').map(Number);
+      downloadTaskIcs(mi, ti);
+    }
+    else if (action === 'del-task') {
+      const [mi, ti] = idx.split(':').map(Number);
+      const removed = data.monthly[mi][ti];
+      if (removed && removed.autoFromGoal) {
+        const g = data.goals.find(x => (removed.goalId && x.id === removed.goalId) || x.title === removed.goal);
+        if (g) g._removedFromMonth = true;
+      }
+      if (removed && removed.autoFromHobby) {
+        const h = data.hobbies.find(x => (removed.hobbyId && x.id === removed.hobbyId) || x.title === removed.text);
+        if (h) h._removedFromMonth = true;
+      }
+      data.monthly[mi].splice(ti, 1);
+      save();
+      render();
+    }
+    else if (action === 'add-hobby') addHobby();
+    else if (action === 'del-hobby') {
+      const h = data.hobbies[+idx];
+      if (h) {
+        Object.keys(data.monthly).forEach(mi => {
+          data.monthly[mi] = (data.monthly[mi] || []).filter(t => !(t.autoFromHobby && ((h.id && t.hobbyId === h.id) || t.text === h.title)));
+        });
+      }
+      data.hobbies.splice(+idx, 1);
+      save();
+      render();
+    }
+    else if (action === 'toggle-hobby') {
+      data.hobbies[+idx].done = !data.hobbies[+idx].done;
+      save();
+      render();
+    }
+    else if (action === 'change-year') changeYear();
+    else if (action === 'export-data') exportData();
+    return;
+  }
+
+  const navBtn = e.target.closest('[data-page], [data-nav]');
+  if (navBtn) {
+    e.preventDefault();
+    const targetPage = navBtn.dataset.page || navBtn.dataset.nav;
+    nav(targetPage);
+  }
+});
+
+document.addEventListener('input', (e) => {
+  const el = e.target;
+  if (el.dataset.rating !== undefined) {
+    setRating(+el.dataset.rating, el.value);
+  } else if (el.dataset.wheelStep) {
+    const [si, stepIdx] = el.dataset.wheelStep.split(':').map(Number);
+    data.wheelActions ??= {};
+    data.wheelActions[si] ??= ['', '', ''];
+    data.wheelActions[si][stepIdx] = el.value;
+    if (data.wheelScheduled && data.wheelScheduled[`${si}_${stepIdx}`]) {
+      delete data.wheelScheduled[`${si}_${stepIdx}`];
+    }
+    save(false);
+  } else if (el.dataset.cardStepText) {
+    const [mi, ti, si] = el.dataset.cardStepText.split(':').map(Number);
+    const t = (data.monthly[mi] || [])[ti];
+    if (t) {
+      ensureTaskStructure(t);
+      t.steps[si].text = el.value;
+      save(false);
+    }
+  } else if (el.dataset.review) {
+    data.review[el.dataset.review] = el.value;
+    save(false);
+  } else if (el.dataset.future) {
+    data.future[el.dataset.future] = el.value;
+    save(false);
+  } else if (el.dataset.wheel) {
+    data.wheelPriority = el.value;
+    save(false);
+  }
+});
+
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.dataset.toggleTask) {
+    const [mi, ti] = el.dataset.toggleTask.split(':').map(Number);
+    data.monthly[mi][ti].done = el.checked;
+    save(false);
+    render();
+  } else if (el.dataset.cardDate) {
+    const [mi, ti] = el.dataset.cardDate.split(':').map(Number);
+    const t = (data.monthly[mi] || [])[ti];
+    if (t) {
+      t.dueDate = el.value || '';
+      save(false);
+      render();
+    }
+  } else if (el.dataset.cardStepDone) {
+    const [mi, ti, si] = el.dataset.cardStepDone.split(':').map(Number);
+    const t = (data.monthly[mi] || [])[ti];
+    if (t) {
+      ensureTaskStructure(t);
+      t.steps[si].done = el.checked;
+      save(false);
+      render();
+    }
+  } else if (el.dataset.assignInbox && el.value !== '') {
+    const uid = el.dataset.assignInbox;
+    const mi = +el.value;
+    data.monthly[mi] ??= [];
+
+    if (uid.startsWith('wheel:')) {
+      const key = uid.slice(6);
+      const [si, stepIdx] = key.split(':').map(Number);
+      const text = ((data.wheelActions[si] || [])[stepIdx] || '').trim();
+      if (text) {
+        const item = { text, goal: spheres[si], done: false, note: '', dueDate: '', reminder: '' };
+        ensureTaskStructure(item);
+        data.monthly[mi].push(item);
+        data.wheelScheduled ??= {};
+        data.wheelScheduled[key] = true;
+        save(false);
+        toast('Перенесено из входящих в ' + months[mi].toLowerCase());
+        render();
+      }
+    } else if (uid.startsWith('hobby:')) {
+      const hid = uid.slice(6);
+      const h = (data.hobbies || []).find(x => x.id === hid);
+      if (h) {
+        h.month = String(mi);
+        delete h._dismissedInbox;
+        delete h._removedFromMonth;
+        const exists = data.monthly[mi].some(t => t.hobbyId === h.id);
+        if (!exists) {
+          const item = {
+            text: h.title,
+            goal: 'Хочу попробовать',
+            hobbyId: h.id,
+            autoFromHobby: true,
+            done: !!h.done,
+            note: h.step ? 'Первый шаг: ' + h.step : '',
+            dueDate: '',
+            reminder: ''
+          };
+          ensureTaskStructure(item);
+          if (h.step) item.steps[0].text = h.step;
+          data.monthly[mi].push(item);
+        }
+        save(false);
+        toast('Перенесено из входящих в ' + months[mi].toLowerCase());
+        render();
+      }
+    }
+  }
+});
+
+// Проверка напоминаний раз в 30 секунд
+function checkReminders() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const todayStr = `${y}-${m}-${d}`;
+  const nowTime = `${hh}:${mm}`;
+
+  let fired = false;
+  Object.keys(data.monthly || {}).forEach(mi => {
+    (data.monthly[mi] || []).forEach(t => {
+      if (!t.done && t.reminder && t.dueDate === todayStr && t.reminder === nowTime && !t._notified) {
+        t._notified = true;
+        fired = true;
+        toast(`⏰ Напоминание: ${t.text}`);
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try {
+            new Notification('МОЙ ГОД — Напоминание', { body: t.text });
+          } catch (e) {}
+        }
+      }
+    });
+  });
+  if (fired) save(false);
+}
+
+setInterval(checkReminders, 30000);
+
+render();
+initCloud();
+</script>
+</body>
+</html>
