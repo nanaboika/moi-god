@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f5f1e9">
+<meta name="description" content="МОЙ ГОД — персональная система планирования жизни на год.">
+<title>МОЙ ГОД — планировщик жизни</title>
+<style>
+:root{--paper:#f5f1e9;--card:#fffdf8;--ink:#292a28;--muted:#77766f;--gold:#b39455;--gold2:#d8c49a;--line:#e7e0d4;--sage:#68796a;--shadow:0 12px 35px rgba(48,42,30,.07)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;touch-action:manipulation}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.app{max-width:1180px;margin:auto;min-height:100vh;padding:0 22px 50px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:24px 0 18px;border-bottom:1px solid var(--line);gap:12px}
+.brand{font-family:Georgia,serif;font-size:25px;letter-spacing:.13em}
+.brand small{display:block;font:10px sans-serif;letter-spacing:.22em;color:var(--muted);margin-top:3px}
+.topright{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.yearpill{border:1px solid var(--gold2);padding:7px 12px;border-radius:30px;color:#806a3f;font-size:13px;white-space:nowrap}
+.syncpill{font-size:11px;color:var(--sage);background:rgba(104,121,106,.12);padding:6px 11px;border-radius:20px;white-space:nowrap;border:1px solid rgba(104,121,106,.2)}
+.layout{display:grid;grid-template-columns:235px 1fr;gap:28px;padding-top:25px}
+.nav{position:sticky;top:15px;align-self:start;background:rgba(255,253,248,.85);border:1px solid var(--line);border-radius:18px;padding:13px;z-index:5}
+.nav button{width:100%;text-align:left;background:none;border:0;padding:11px 12px;border-radius:10px;color:#55554f;font-size:13px;margin:2px 0;transition:.15s}
+.nav button.active,.nav button:hover{background:#eee7d9;color:var(--ink)}
+.nav .navgroup{font-size:10px;color:#a18b60;letter-spacing:.15em;padding:13px 12px 4px;text-transform:uppercase}
+.content{min-width:0;position:relative;z-index:2}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:220px;height:220px;border:1px solid #e8dfce;border-radius:50%;right:-65px;top:-105px;box-shadow:0 0 0 18px rgba(179,148,85,.035),0 0 0 38px rgba(179,148,85,.025);pointer-events:none;z-index:0}
+.hero > *{position:relative;z-index:1}
+.eyebrow{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.hero h1{font:34px/1.16 Georgia,serif;font-weight:400;margin:10px 0}
+.hero p{color:var(--muted);max-width:620px;margin:0}
+.hero-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{border:1px solid var(--gold);background:var(--ink);color:#fffdf8;border-radius:30px;padding:10px 17px;font-size:13px;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.secondary:hover{background:#eee7d9}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#fffdf8}
+.btn.danger{background:transparent;color:#a84a3f;border-color:#e3c5c1}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:28px 0 14px}
+.sectionhead h2{font:27px Georgia,serif;font-weight:400;margin:0}
+.sectionhead p{color:var(--muted);font-size:13px;margin:4px 0 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tile,.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:18px}
+.tile{min-height:132px;cursor:pointer;transition:.18s}
+.tile:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.tile .num{font:24px Georgia,serif;color:var(--gold)}
+.tile h3{font:18px Georgia,serif;font-weight:400;margin:8px 0 3px}
+.tile p,.muted{color:var(--muted);font-size:13px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:15px}
+.stat{background:#eee8dc;border-radius:14px;padding:14px}
+.stat strong{font:25px Georgia,serif;display:block}
+.stat span{font-size:11px;color:var(--muted)}
+.progress{height:6px;background:#e8e1d5;border-radius:20px;overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;background:var(--gold);border-radius:20px;transition:width .3s}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.field label{font-size:12px;color:#77766f}
+.field input,.field textarea,.field select{width:100%;background:#fffefa;border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);outline:none;font-size:16px}
+.field textarea{min-height:90px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.item{padding:13px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.tag{display:inline-block;background:#eee8dc;color:#74613c;padding:4px 9px;border-radius:20px;font-size:11px}
+.del{border:0;background:none;color:#a49c8d;font-size:21px;padding:4px 10px}
+.del:hover{color:#a84a3f}
+.wheelwrap{display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:20px;align-items:center}
+.wheel{width:100%;max-width:390px;margin:auto;display:block}
+.rangeRow{display:grid;grid-template-columns:1fr 38px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+input[type=range]{accent-color:var(--gold);width:100%;height:28px}
+.months{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.month{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fffefa;min-height:105px;cursor:pointer;transition:.15s}
+.month:hover,.month.selected{border-color:var(--gold);background:#fbf7ee}
+.month strong{font:17px Georgia,serif;display:block;margin-bottom:6px}
+.month small{color:var(--muted)}
+.check{display:flex;gap:9px;align-items:flex-start;font-size:13px;padding:7px 0;cursor:pointer}
+.check input{accent-color:var(--sage);margin-top:3px;width:18px;height:18px}
+.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:13px;font-size:13px}
+.footer{color:#a19a8d;font-size:11px;text-align:center;padding:30px 0 10px}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#292a28;color:#fff;padding:10px 18px;border-radius:30px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:99}
+.toast.show{opacity:1}
+.mobilebar{display:none}
+.modal-backdrop{position:fixed;inset:0;background:rgba(41,42,40,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:90;backdrop-filter:blur(3px)}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:440px;width:100%;box-shadow:var(--shadow);max-height:90vh;overflow-y:auto}
+.modal h3{font:21px Georgia,serif;font-weight:400;margin:0 0 8px}
+.tabs{display:flex;gap:6px;background:#eee8dc;padding:4px;border-radius:12px;margin-bottom:14px}
+.tabs button{flex:1;border:0;background:none;padding:8px;border-radius:9px;font-size:13px;color:var(--muted)}
+.tabs button.active{background:var(--card);color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.auth-banner{background:#fbf7ee;border:1px solid var(--gold2);border-radius:16px;padding:14px 18px;margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+@media(max-width:760px){
+  .app{padding:0 14px 92px}
+  .top{padding:15px 0}
+  .brand{font-size:20px}
+  .layout{display:block;padding-top:15px}
+  .nav{display:none}
+  .hero{padding:22px 18px}
+  .hero h1{font-size:27px}
+  .grid{grid-template-columns:1fr 1fr;gap:9px}
+  .tile{padding:13px;min-height:118px}
+  .tile h3{font-size:16px}
+  .stats{gap:7px}
+  .stat{padding:10px}
+  .stat strong{font-size:21px}
+  .formgrid{grid-template-columns:1fr}
+  .wheelwrap{grid-template-columns:1fr}
+  .months{grid-template-columns:repeat(2,1fr)}
+  .mobilebar{display:flex;position:fixed;bottom:0;left:0;right:0;background:rgba(255,253,248,.98);border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom));justify-content:space-around;z-index:50;backdrop-filter:blur(10px)}
+  .mobilebar button{background:none;border:0;color:#777;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 6px;min-width:48px}
+  .mobilebar b{font-size:18px;font-weight:400}
+  .mobilebar button.active{color:#967b43}
+  .sectionhead h2{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand">МОЙ ГОД<small>ПРОЕКТИРУЙ. ДЕЙСТВУЙ. ЖИВИ.</small></div>
+  <div class="topright">
+    <button class="syncpill" id="syncStatus" data-action="open-auth">Облако: Войти</button>
+    <span class="yearpill" id="yearLabel">2027 · МОЙ ПЛАН</span>
+  </div>
+</header>
+<div class="layout">
+<aside class="nav" id="sideNav">
+  <div class="navgroup">Мой год</div>
+  <button type="button" data-page="home" class="active">⌂　Обзор</button>
+  <button type="button" data-page="review">01　Итоги года</button>
+  <button type="button" data-page="wheel">02　Колесо баланса</button>
+  <button type="button" data-page="future">03　Путешествие в будущее</button>
+  <button type="button" data-page="goals">04　Желания и цели</button>
+  <button type="button" data-page="months">05　План по месяцам</button>
+  <div class="navgroup">Моя жизнь</div>
+  <button type="button" data-page="hobbies">✳　Хочу попробовать</button>
+  <button type="button" data-page="reflection">06　Итоги месяца</button>
+  <button type="button" data-page="settings">⚙　Аккаунт и данные</button>
+</aside>
+<main class="content" id="main"></main>
+</div>
+<div class="footer">МОЙ ГОД · Личное пространство для планирования жизни</div>
+</div>
+
+<nav class="mobilebar" id="mobileNav">
+  <button type="button" data-page="home" class="active"><b>⌂</b>Обзор</button>
+  <button type="button" data-page="goals"><b>◎</b>Цели</button>
+  <button type="button" data-page="months"><b>▦</b>Месяцы</button>
+  <button type="button" data-page="hobbies"><b>✳</b>Хочу</button>
+  <button type="button" data-page="wheel"><b>◉</b>Баланс</button>
+  <button type="button" data-page="settings"><b>⚙</b>Профиль</button>
+</nav>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div class="toast" id="toast">Сохранено</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://sktdzgzzthmhtslmltac.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_5DhJevtuh0t17B1vvabFFQ_OlkGbD48';
+let sb = null;
+try {
+  if (window.supabase) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch (e) {}
+
+const KEY = 'moi-god-v1';
+const ACCOUNT_KEY = 'moi-god-account-v1';
+const spheres = ['Здоровье и внешность','Семья и дети','Отношения с партнёром','Деньги','Работа и карьера','Бизнес и самореализация','Отдых и путешествия','Развитие и хобби'];
+const months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+let telegramUserId = null;
+
+if (tg) {
+  try {
+    tg.ready();
+    tg.expand();
+    if (typeof tg.disableVerticalSwipes === 'function') {
+      tg.disableVerticalSwipes();
+    }
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+      telegramUserId = 'tg_' + String(tg.initDataUnsafe.user.id);
+    }
+  } catch (e) {}
+}
+
+let savedAccount = null;
+try {
+  savedAccount = JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null');
+} catch (e) {}
+
+let data = loadLocal();
+let page = 'home';
+let activeMonth = 0;
+let saveTimer = null;
+
+function blank() {
+  return {
+    year: new Date().getFullYear() + 1,
+    review: {},
+    ratings: Array(8).fill(5),
+    wheelPriority: '',
+    future: {},
+    goals: [],
+    hobbies: [],
+    monthly: {},
+    reflections: {}
+  };
+}
+
+function loadLocal() {
+  try {
+    return { ...blank(), ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+  } catch (e) {
+    return blank();
+  }
+}
+
+function getActiveCloudId() {
+  if (savedAccount && savedAccount.email) {
+    return 'email_' + savedAccount.email.toLowerCase().trim();
+  }
+  if (telegramUserId) {
+    return telegramUserId;
+  }
+  return null;
+}
+
+function setSyncLabel(text) {
+  const el = document.getElementById('syncStatus');
+  if (el) el.textContent = text;
+}
+
+async function hashPassword(str) {
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str + '_moigod_salt'));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+}
+
+async function initCloud() {
+  const cloudId = getActiveCloudId();
+  if (!sb || !cloudId) {
+    setSyncLabel('Войти в облако');
+    return;
+  }
+  setSyncLabel('Синхронизация...');
+  try {
+    const { data: row, error } = await sb
+      .from('user_plans')
+      .select('data')
+      .eq('telegram_id', cloudId)
+      .maybeSingle();
+
+    if (!error && row && row.data) {
+      const remoteData = { ...row.data };
+      delete remoteData._auth_hash;
+      data = { ...blank(), ...remoteData };
+      localStorage.setItem(KEY, JSON.stringify(data));
+      render();
+    } else if (!error && !row) {
+      await pushToCloud();
+    }
+    setSyncLabel(savedAccount ? savedAccount.email : 'Telegram ✓');
+  } catch (e) {
+    setSyncLabel('Офлайн');
+  }
+}
+
+async function pushToCloud() {
+  const cloudId = getActiveCloudId();
+  if (!sb || !cloudId) return;
+  setSyncLabel('Сохранение...');
+  try {
+    const payload = { ...data };
+    if (savedAccount && savedAccount.hash) {
+      payload._auth_hash = savedAccount.hash;
+    }
+    const { error } = await sb
+      .from('user_plans')
+      .upsert({
+        telegram_id: cloudId,
+        data: payload,
+        updated_at: new Date().toISOString()
+      });
+    setSyncLabel(error ? 'Ошибка сети' : (savedAccount ? savedAccount.email : 'Telegram ✓'));
+  } catch (e) {
+    setSyncLabel('Ошибка сети');
+  }
+}
+
+function save(msg = true) {
+  localStorage.setItem(KEY, JSON.stringify(data));
+  if (msg) toast('Сохранено');
+  if (sb && getActiveCloudId()) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(pushToCloud, 600);
+  }
+}
+
+function toast(t) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = t;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1700);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function openModal(html) {
+  document.getElementById('modalBox').innerHTML = html;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+function nav(p) {
+  if (!pages[p]) return;
+  page = p;
+  document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === p));
+  render();
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+}
+
+function head(title, sub, action = '') {
+  return `<div class="sectionhead"><div><div class="eyebrow">МОЙ ${data.year} ГОД</div><h2>${title}</h2><p>${sub || ''}</p></div>${action}</div>`;
+}
+
+function render() {
+  document.getElementById('yearLabel').textContent = data.year + ' · МОЙ ПЛАН';
+  const m = document.getElementById('main');
+  m.innerHTML = pages[page]();
+  wire();
+}
+
+function openAuthModal(mode = 'login') {
+  openModal(`
+    <div class="eyebrow">ОБЛАЧНЫЙ АККАУНТ</div>
+    <h3 style="margin-top:4px">${mode === 'login' ? 'Вход в планировщик' : 'Регистрация аккаунта'}</h3>
+    <p class="muted" style="margin-bottom:14px">Создай аккаунт с почтой и паролем, чтобы открывать свой план с любого телефона или компьютера.</p>
+    <div class="tabs">
+      <button type="button" class="${mode === 'login' ? 'active' : ''}" data-action="auth-tab" data-mode="login">Войти</button>
+      <button type="button" class="${mode === 'register' ? 'active' : ''}" data-action="auth-tab" data-mode="register">Регистрация</button>
+    </div>
+    <div class="field"><label>Электронная почта (Email)</label><input type="email" id="authEmail" placeholder="name@example.com" autocomplete="email"></div>
+    <div class="field"><label>Пароль</label><input type="password" id="authPass" placeholder="Минимум 4 символа" autocomplete="current-password"></div>
+    <div id="authError" style="color:#a84a3f;font-size:12px;min-height:18px;margin-top:4px"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
+      <button type="button" class="btn secondary" data-action="close-modal">Отмена</button>
+      <button type="button" class="btn gold" data-action="submit-auth" data-mode="${mode}">${mode === 'login' ? 'Войти и загрузить' : 'Зарегистрироваться'}</button>
+    </div>
+  `);
+}
+
+async function handleAuthSubmit(mode) {
+  const emailEl = document.getElementById('authEmail');
+  const passEl = document.getElementById('authPass');
+  const errEl = document.getElementById('authError');
+  const email = (emailEl.value || '').trim().toLowerCase();
+  const pass = (passEl.value || '').trim();
+
+  if (!email || !email.includes('@')) {
+    errEl.textContent = 'Введи корректный email';
+    return;
+  }
+  if (pass.length < 4) {
+    errEl.textContent = 'Пароль должен быть не короче 4 символов';
+    return;
+  }
+  if (!sb) {
+    errEl.textContent = 'Нет подключения к облачной базе';
+    return;
+  }
+
+  errEl.textContent = 'Проверяем данные...';
+  const cloudId = 'email_' + email;
+  const passHash = await hashPassword(pass);
+
+  try {
+    const { data: row, error } = await sb
+      .from('user_plans')
+      .select('data')
+      .eq('telegram_id', cloudId)
+      .maybeSingle();
+
+    if (error) {
+      errEl.textContent = 'Ошибка соединения с базой';
+      return;
+    }
+
+    if (mode === 'register') {
+      if (row && row.data && row.data._auth_hash) {
+        errEl.textContent = 'Этот email уже зарегистрирован. Переключись на вкладку «Войти».';
+        return;
+      }
+      savedAccount = { email, hash: passHash };
+      localStorage.setItem(ACCOUNT_KEY, JSON.stringify(savedAccount));
+      await pushToCloud();
+      closeModal();
+      render();
+      toast('Аккаунт создан и синхронизирован!');
+    } else {
+      if (!row || !row.data) {
+        errEl.textContent = 'Аккаунт с таким email не найден. Нажми «Регистрация».';
+        return;
+      }
+      if (row.data._auth_hash && row.data._auth_hash !== passHash) {
+        errEl.textContent = 'Неверный пароль';
+        return;
+      }
+      savedAccount = { email, hash: row.data._auth_hash || passHash };
+      localStorage.setItem(ACCOUNT_KEY, JSON.stringify(savedAccount));
+      const remoteData = { ...row.data };
+      delete remoteData._auth_hash;
+      data = { ...blank(), ...remoteData };
+      localStorage.setItem(KEY, JSON.stringify(data));
+      setSyncLabel(email);
+      closeModal();
+      render();
+      toast('С возвращением! Данные загружены.');
+    }
+  } catch (e) {
+    errEl.textContent = 'Не удалось выполнить вход';
+  }
+}
+
+function logoutAccount() {
+  savedAccount = null;
+  localStorage.removeItem(ACCOUNT_KEY);
+  setSyncLabel(telegramUserId ? 'Telegram ✓' : 'Войти в облако');
+  render();
+  toast('Ты вышла из аккаунта');
+}
+
+const pages = {
+  home: () => {
+    const complete = [
+      Object.values(data.review).filter(Boolean).length > 0,
+      data.ratings.some(x => x !== 5),
+      Object.values(data.future).some(Boolean),
+      data.goals.length > 0,
+      Object.values(data.monthly).some(a => a && a.length),
+      data.hobbies.length > 0
+    ].filter(Boolean).length;
+
+    const userName = savedAccount
+      ? `, ${esc(savedAccount.email.split('@')[0])}`
+      : (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name
+        ? `, ${esc(tg.initDataUnsafe.user.first_name)}`
+        : '');
+
+    return `
+<section class="hero">
+  <div class="eyebrow">ТВОЁ ЛИЧНОЕ ПРОСТРАНСТВО${userName.toUpperCase()}</div>
+  <h1>Твой год начинается<br>с твоего решения.</h1>
+  <p>Здесь ты собираешь всё, что хочешь изменить, попробовать и прожить. Не идеальный план, а твой собственный маршрут на ${data.year} год.</p>
+  <div class="hero-actions">
+    <button type="button" class="btn gold" data-nav="review">Начать планирование →</button>
+    <button type="button" class="btn secondary" data-nav="goals">К моим целям</button>
+  </div>
+</section>
+${!savedAccount ? `<div class="auth-banner">
+  <div>
+    <strong style="font:16px Georgia,serif;display:block">Сохрани свой план в облаке</strong>
+    <span class="muted">Зарегистрируйся по email, чтобы данные не потерялись и открывались на любом устройстве.</span>
+  </div>
+  <div class="row">
+    <button type="button" class="btn gold" data-action="open-auth" data-mode="register">Регистрация</button>
+    <button type="button" class="btn secondary" data-action="open-auth" data-mode="login">Войти</button>
+  </div>
+</div>` : ''}
+<div class="stats">
+  <div class="stat"><strong>${data.goals.length}</strong><span>целей записано</span></div>
+  <div class="stat"><strong>${data.hobbies.length}</strong><span>новых впечатлений</span></div>
+  <div class="stat"><strong>${complete}/6</strong><span>этапов начато</span></div>
+</div>
+${head('Твой маршрут', 'Проходи этапы в своём темпе. Все записи сохраняются автоматически.')}
+<div class="grid">${[
+  ['review', '01', 'Итоги прошлого года', 'Остановиться, оглянуться и забрать важное.'],
+  ['wheel', '02', 'Колесо баланса', 'Посмотреть, как сейчас распределено внимание.'],
+  ['future', '03', 'Путешествие в будущее', 'Представить свою жизнь через год.'],
+  ['goals', '04', 'Желания и цели', 'Записать, чего хочется в каждой сфере.'],
+  ['months', '05', 'План по месяцам', 'Превратить желания в последовательность действий.'],
+  ['hobbies', '✳', 'Хочу попробовать', 'Оставить место любопытству и новым увлечениям.']
+].map(x => `<div class="tile" data-nav="${x[0]}"><div class="num">${x[1]}</div><h3>${x[2]}</h3><p>${x[3]}</p></div>`).join('')}</div>
+${head('Небольшое напоминание', 'План — это компас, а не клетка. Его можно менять вместе с жизнью.')}`;
+  },
+
+  review: () => `${head('Итоги прошлого года', 'Сначала замечаем, что уже произошло. Не обесценивай маленькие победы.')}
+<div class="panel">
+  <div class="field"><label>Три главных события года</label><textarea data-review="events" placeholder="Что особенно запомнилось?">${esc(data.review.events)}</textarea></div>
+  <div class="field"><label>Чем я горжусь?</label><textarea data-review="proud" placeholder="Даже если это было непросто...">${esc(data.review.proud)}</textarea></div>
+  <div class="field"><label>Какие цели и желания удалось реализовать?</label><textarea data-review="achieved">${esc(data.review.achieved)}</textarea></div>
+  <div class="field"><label>Что не получилось? Почему?</label><textarea data-review="notdone">${esc(data.review.notdone)}</textarea></div>
+  <div class="field"><label>Какие уроки я забираю с собой?</label><textarea data-review="lessons">${esc(data.review.lessons)}</textarea></div>
+  <div class="field"><label>Что я хочу оставить в прошлом году?</label><textarea data-review="leave">${esc(data.review.leave)}</textarea></div>
+  <button type="button" class="btn gold" data-action="save-fields" data-group="review">Сохранить итоги</button>
+</div>`,
+
+  wheel: () => `${head('Колесо баланса', 'Оцени каждую сферу от 1 до 10. Это не экзамен, а снимок твоего состояния сегодня.')}
+<div class="panel wheelwrap">
+  <div>
+    <svg id="wheelSvg" class="wheel" viewBox="0 0 360 360"></svg>
+    <p class="muted" style="text-align:center;margin-top:8px">Диаграмма обновляется при изменении оценок</p>
+  </div>
+  <div>
+    ${spheres.map((s, i) => `<div class="rangeRow"><div><label>${i + 1}. ${s}</label><input type="range" min="1" max="10" value="${data.ratings[i]}" data-rating="${i}"></div><strong id="rate${i}">${data.ratings[i]}</strong></div>`).join('')}
+    <div class="field"><label>Какие две сферы сейчас важнее всего изменить?</label><textarea data-wheel="priority" placeholder="Запиши свои наблюдения...">${esc(data.wheelPriority)}</textarea></div>
+    <button type="button" class="btn gold" data-action="save-fields" data-group="wheel">Сохранить колесо</button>
+  </div>
+</div>`,
+
+  future: () => `${head('Путешествие в будущее', `Представь, что сегодня 31 декабря ${data.year} года. Ты оглядываешься на прожитый год. Каким он стал?`)}
+<div class="hero" style="margin-bottom:14px">
+  <div class="eyebrow">НЕ СПЕШИ. ПРЕДСТАВЬ.</div>
+  <h1 style="font-size:27px">Ты уже там. Это твой декабрь.</h1>
+  <p>Можно включить спокойную музыку, закрыть глаза и представить обычный день своей будущей жизни. Затем возвращайся и записывай то, что увидела.</p>
+</div>
+<div class="panel">
+  ${[
+    ['place', 'Где ты живёшь и как выглядит твоё пространство?'],
+    ['day', 'Как проходит твой обычный день?'],
+    ['work', 'Чем ты занимаешься и как зарабатываешь?'],
+    ['people', 'Кто рядом с тобой? Какие у тебя отношения с близкими?'],
+    ['body', 'Как ты себя чувствуешь? Как заботишься о себе?'],
+    ['joy', 'Что нового и радостного появилось в твоей жизни?'],
+    ['proud', 'За что ты благодарна себе в этом году?'],
+    ['word', 'Одним словом: каким был твой год?']
+  ].map(([k, l]) => `<div class="field"><label>${l}</label><textarea data-future="${k}" placeholder="Опиши свою картину...">${esc(data.future[k])}</textarea></div>`).join('')}
+  <button type="button" class="btn gold" data-action="save-fields" data-group="future">Сохранить моё будущее</button>
+</div>`,
+
+  goals: () => `${head('Мои желания и цели', 'Записывай важное по сферам. Не каждое желание обязано стать задачей прямо сейчас.')}
+<div class="panel">
+  <div class="formgrid">
+    <div class="field"><label>Жизненная сфера</label><select id="goalSphere">${spheres.map((s, i) => `<option value="${i}">${s}</option>`).join('')}</select></div>
+    <div class="field"><label>Тип</label><select id="goalType"><option>Цель</option><option>Мечта</option><option>Изменение</option></select></div>
+  </div>
+  <div class="field"><label>Чего я хочу?</label><input id="goalTitle" placeholder="Например: пробежать полумарафон"></div>
+  <div class="field"><label>Почему это важно для меня?</label><textarea id="goalWhy" placeholder="Что изменится, когда это произойдёт?"></textarea></div>
+  <div class="formgrid">
+    <div class="field"><label>Как пойму, что получилось?</label><input id="goalResult" placeholder="Измеримый результат"></div>
+    <div class="field"><label>Желаемый месяц результата</label><select id="goalMonth"><option value="">Пока не знаю</option>${months.map((m, i) => `<option value="${i}">${m}</option>`).join('')}</select></div>
+  </div>
+  <button type="button" class="btn gold" data-action="add-goal">Добавить в мой список</button>
+</div>
+${head('Мой список', 'Нажми «+ Шаг в план месяца», чтобы добавить конкретное действие.')}
+${data.goals.length ? data.goals.map((g, i) => `<div class="panel item" style="margin-bottom:12px">
+  <div class="between">
+    <div><span class="tag">${spheres[g.sphere]}</span> <span class="tag">${g.type}</span>${g.month !== '' && g.month !== undefined ? ` <span class="tag">Ориентир: ${months[+g.month]}</span>` : ''}</div>
+    <button type="button" class="del" data-action="confirm-del-goal" data-index="${i}">×</button>
+  </div>
+  <h3 style="font:20px Georgia,serif;margin:9px 0">${esc(g.title)}</h3>
+  ${g.why ? `<p class="muted">${esc(g.why)}</p>` : ''}
+  ${g.result ? `<p class="muted" style="margin-top:4px">Критерий: ${esc(g.result)}</p>` : ''}
+  <div class="row" style="margin-top:12px">
+    <button type="button" class="btn secondary" data-action="open-goal-modal" data-index="${i}">+ Шаг в план месяца</button>
+    <span class="muted">${(g.tasks || []).length} шагов</span>
+  </div>
+</div>`).join('') : '<div class="empty">Здесь появятся твои цели и мечты.</div>'}`,
+
+  months: () => `${head('План на 12 месяцев', 'Выбирай месяц, добавляй действия и связывай их со своими целями.')}
+<div class="months">${months.map((m, i) => {
+  const arr = data.monthly[i] || [];
+  return `<div class="month ${activeMonth === i ? 'selected' : ''}" id="monthCard${i}" data-action="open-month" data-index="${i}"><strong>${m}</strong><small>${arr.filter(x => x.done).length}/${arr.length} выполнено</small><div class="progress"><i style="width:${arr.length ? 100 * arr.filter(x => x.done).length / arr.length : 0}%"></i></div></div>`;
+}).join('')}</div>
+<div id="monthDetail" style="margin-top:16px"></div>`,
+
+  hobbies: () => `${head('Хочу попробовать!', 'Не всё в жизни должно быть целью. Оставь место экспериментам, интересу и удовольствию.')}
+<div class="panel">
+  <div class="field"><label>Что хочется попробовать?</label><input id="hobbyTitle" placeholder="Например: урок верховой езды"></div>
+  <div class="formgrid">
+    <div class="field"><label>Почему мне это интересно?</label><input id="hobbyWhy" placeholder="Давно мечтала..."></div>
+    <div class="field"><label>Когда хотелось бы попробовать?</label><select id="hobbyMonth"><option value="">Пока не знаю</option>${months.map((m, i) => `<option value="${i}">${m}</option>`).join('')}</select></div>
+  </div>
+  <div class="field"><label>Первый маленький шаг</label><input id="hobbyStep" placeholder="Найти студию, узнать расписание..."></div>
+  <button type="button" class="btn gold" data-action="add-hobby">Добавить в список</button>
+</div>
+${head('Моя коллекция впечатлений', 'Отмечай, что уже попробовала — даже если решила, что это не твоё.')}
+${data.hobbies.length ? data.hobbies.map((h, i) => `<div class="panel item" style="margin-bottom:12px">
+  <div class="between">
+    <div><span class="tag">${h.month === '' ? 'Без даты' : months[+h.month]}</span> <span class="tag">${h.done ? 'Попробовала ✓' : 'Хочу попробовать'}</span></div>
+    <button type="button" class="del" data-action="del-hobby" data-index="${i}">×</button>
+  </div>
+  <div class="between">
+    <h3 style="font:19px Georgia,serif;margin:8px 0">${esc(h.title)}</h3>
+    <button type="button" class="btn secondary" data-action="toggle-hobby" data-index="${i}">${h.done ? 'Вернуть в список' : 'Я попробовала!'}</button>
+  </div>
+  <p class="muted">${esc(h.why)}${h.step ? ' · Первый шаг: ' + esc(h.step) : ''}</p>
+</div>`).join('') : '<div class="empty">Твоя коллекция новых впечатлений пока пуста. Это легко исправить.</div>'}`,
+
+  reflection: () => `${head('Итоги месяца', 'Небольшая остановка, чтобы заметить прогресс и скорректировать маршрут.')}
+<div class="panel">
+  <div class="field"><label>Месяц</label><select id="reflectionMonth">${months.map((m, i) => `<option value="${i}">${m}</option>`).join('')}</select></div>
+  ${[
+    ['wins', 'Что получилось в этом месяце?'],
+    ['hard', 'Что оказалось сложным?'],
+    ['learned', 'Что я поняла или чему научилась?'],
+    ['next', 'Что переношу или меняю в следующем месяце?'],
+    ['thanks', 'За что благодарна себе?']
+  ].map(([k, l]) => `<div class="field"><label>${l}</label><textarea id="refl_${k}" placeholder="Запиши свои мысли..."></textarea></div>`).join('')}
+  <button type="button" class="btn gold" data-action="save-reflection">Сохранить итоги месяца</button>
+</div>
+${head('Мои прошлые заметки', 'Возвращайся к ним, чтобы видеть свой путь.')}
+${Object.keys(data.reflections).length ? Object.keys(data.reflections).sort((a, b) => a - b).map(k => `<div class="panel item" style="margin-bottom:10px;cursor:pointer" data-action="select-reflection" data-index="${k}"><strong>${months[+k]}</strong><p class="muted">${esc(data.reflections[k].wins || data.reflections[k].thanks || 'Заметка сохранена')}</p></div>`).join('') : '<div class="empty">Здесь появятся твои ежемесячные итоги.</div>'}`,
+
+  settings: () => `${head('Аккаунт и данные', 'Синхронизация между устройствами и резервная копия записей.')}
+<div class="panel">
+  <h3 style="font:20px Georgia,serif;margin:0 0 6px">Облачный аккаунт</h3>
+  ${savedAccount ? `
+    <p class="muted">Ты вошла как <strong>${esc(savedAccount.email)}</strong>. Все изменения автоматически сохраняются в облаке и доступны с любого устройства.</p>
+    <div class="row" style="margin-top:12px">
+      <button type="button" class="btn secondary" data-action="sync-now">Обновить из облака</button>
+      <button type="button" class="btn danger" data-action="logout">Выйти из аккаунта</button>
+    </div>
+  ` : `
+    <p class="muted">${telegramUserId ? 'Сейчас записи привязаны только к твоему Telegram ID. Зарегистрируйся по email, чтобы открывать свой план ещё и в обычном браузере с любого компьютера.' : 'Зарегистрируйся по email и паролю, чтобы сохранить свой план в облаке и заходить с любого устройства.'}</p>
+    <div class="row" style="margin-top:12px">
+      <button type="button" class="btn gold" data-action="open-auth" data-mode="register">Зарегистрироваться</button>
+      <button type="button" class="btn secondary" data-action="open-auth" data-mode="login">Войти в аккаунт</button>
+    </div>
+  `}
+  <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+  <div class="field"><label>Год планирования</label><input type="number" id="planYear" min="2024" max="2100" value="${data.year}"></div>
+  <button type="button" class="btn gold" data-action="change-year">Сохранить год</button>
+  <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+  <h3 style="font:20px Georgia,serif;margin:0 0 6px">Резервная копия (JSON)</h3>
+  <p class="muted">Скачай файл со своими данными, чтобы хранить его отдельно.</p>
+  <div class="row" style="margin-top:12px">
+    <button type="button" class="btn secondary" data-action="export-data">Скачать мои данные</button>
+    <label class="btn secondary" style="cursor:pointer">Импортировать<input type="file" id="importFileInput" accept="application/json" hidden></label>
+  </div>
+</div>`
+};
+
+function wire() {
+  if (page === 'wheel') drawWheel();
+  if (page === 'months') openMonth(activeMonth);
+  if (page === 'reflection') {
+    const sel = document.getElementById('reflectionMonth');
+    if (sel) {
+      loadReflectionForm(sel.value);
+      sel.onchange = () => loadReflectionForm(sel.value);
+    }
+  }
+  const imp = document.getElementById('importFileInput');
+  if (imp) imp.onchange = importData;
+}
+
+function saveFields(group) {
+  document.querySelectorAll(`[data-${group}]`).forEach(el => {
+    const k = el.dataset[group];
+    if (group === 'review') data.review[k] = el.value;
+    else if (group === 'future') data.future[k] = el.value;
+    else if (group === 'wheel') data.wheelPriority = el.value;
+  });
+  save(true);
+}
+
+function setRating(i, v) {
+  data.ratings[i] = +v;
+  const lbl = document.getElementById('rate' + i);
+  if (lbl) lbl.textContent = v;
+  drawWheel();
+  save(false);
+}
+
+function drawWheel() {
+  const svg = document.getElementById('wheelSvg');
+  if (!svg) return;
+  const cx = 180, cy = 180, r = 135, n = 8, pts = [];
+  for (let j = 0; j < n; j++) {
+    const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+    const rr = r * data.ratings[j] / 10;
+    pts.push([cx + rr * Math.cos(a), cy + rr * Math.sin(a)].join(','));
+  }
+  let s = '';
+  for (let ring = 2; ring <= 10; ring += 2) {
+    const p = [];
+    for (let j = 0; j < n; j++) {
+      const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+      p.push([cx + r * ring / 10 * Math.cos(a), cy + r * ring / 10 * Math.sin(a)].join(','));
+    }
+    s += `<polygon points="${p.join(' ')}" fill="none" stroke="#e5ddcf" stroke-width="1"/>`;
+  }
+  for (let j = 0; j < n; j++) {
+    const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+    s += `<line x1="${cx}" y1="${cy}" x2="${cx + r * Math.cos(a)}" y2="${cy + r * Math.sin(a)}" stroke="#e5ddcf"/>`;
+  }
+  s += `<polygon points="${pts.join(' ')}" fill="rgba(179,148,85,.25)" stroke="#b39455" stroke-width="2"/>`;
+  pts.forEach(p => {
+    const [x, y] = p.split(',');
+    s += `<circle cx="${x}" cy="${y}" r="4.5" fill="#9b7e43"/>`;
+  });
+  s += `<circle cx="${cx}" cy="${cy}" r="3" fill="#9b7e43"/>`;
+  spheres.forEach((v, j) => {
+    const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+    const x = cx + 158 * Math.cos(a);
+    const y = cy + 158 * Math.sin(a);
+    s += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="600" fill="#777">${j + 1}</text>`;
+  });
+  svg.innerHTML = s;
+}
+
+function addGoal() {
+  const title = document.getElementById('goalTitle').value.trim();
+  if (!title) { toast('Напиши, чего ты хочешь'); return; }
+  data.goals.push({
+    title,
+    sphere: +document.getElementById('goalSphere').value,
+    type: document.getElementById('goalType').value,
+    why: document.getElementById('goalWhy').value,
+    result: document.getElementById('goalResult').value,
+    month: document.getElementById('goalMonth').value,
+    tasks: []
+  });
+  save();
+  render();
+}
+
+function confirmDeleteGoal(i) {
+  openModal(`
+    <h3>Удалить цель?</h3>
+    <p class="muted" style="margin-bottom:18px">Цель «${esc(data.goals[i].title)}» будет удалена из списка.</p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn secondary" data-action="close-modal">Отмена</button>
+      <button type="button" class="btn danger" data-action="del-goal" data-index="${i}">Удалить</button>
+    </div>
+  `);
+}
+
+function deleteGoal(i) {
+  data.goals.splice(i, 1);
+  closeModal();
+  save();
+  render();
+}
+
+function openGoalActionModal(i) {
+  const g = data.goals[i];
+  openModal(`
+    <div class="eyebrow">ПЛАН ДЕЙСТВИЙ</div>
+    <h3 style="margin-top:4px">${esc(g.title)}</h3>
+    <div class="field"><label>В каком месяце сделать шаг?</label><select id="modalActionMonth">${months.map((m, idx) => `<option value="${idx}" ${String(g.month) === String(idx) ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
+    <div class="field"><label>Какое конкретное действие?</label><input id="modalActionText" placeholder="Например: записаться на пробное занятие"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:16px">
+      <button type="button" class="btn secondary" data-action="close-modal">Отмена</button>
+      <button type="button" class="btn gold" data-action="save-goal-action" data-index="${i}">Добавить в план</button>
+    </div>
+  `);
+}
+
+function saveGoalAction(i) {
+  const text = document.getElementById('modalActionText').value.trim();
+  if (!text) { toast('Напиши действие'); return; }
+  const mi = +document.getElementById('modalActionMonth').value;
+  const g = data.goals[i];
+  g.tasks ??= [];
+  g.tasks.push({ month: mi, text, done: false });
+  data.monthly[mi] ??= [];
+  data.monthly[mi].push({ text, goal: g.title, done: false });
+  closeModal();
+  save();
+  render();
+}
+
+function addHobby() {
+  const title = document.getElementById('hobbyTitle').value.trim();
+  if (!title) { toast('Добавь увлечение'); return; }
+  data.hobbies.push({
+    title,
+    why: document.getElementById('hobbyWhy').value,
+    month: document.getElementById('hobbyMonth').value,
+    step: document.getElementById('hobbyStep').value,
+    done: false
+  });
+  save();
+  render();
+}
+
+function openMonth(i) {
+  activeMonth = i;
+  document.querySelectorAll('.month').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+  const d = document.getElementById('monthDetail');
+  if (!d) return;
+  const arr = data.monthly[i] || [];
+  d.innerHTML = `<div class="panel">
+    <div class="between">
+      <div><div class="eyebrow">МОИ ДЕЙСТВИЯ</div><h3 style="font:22px Georgia,serif;margin:4px 0">${months[i]}</h3></div>
+      <span class="tag">${arr.filter(x => x.done).length}/${arr.length}</span>
+    </div>
+    <div class="field"><label>Новое действие</label><input id="taskText" placeholder="Что я сделаю в этом месяце?"></div>
+    <div class="field"><label>Связать с целью (необязательно)</label><select id="taskGoal"><option value="">Без привязки</option>${data.goals.map(g => `<option>${esc(g.title)}</option>`).join('')}</select></div>
+    <button type="button" class="btn gold" data-action="add-task" data-index="${i}">Добавить действие</button>
+    <div style="margin-top:12px">${arr.length ? arr.map((t, j) => `<div class="between item"><label class="check"><input type="checkbox" ${t.done ? 'checked' : ''} data-toggle-task="${i}:${j}"><span style="${t.done ? 'text-decoration:line-through;color:#999' : ''}">${esc(t.text)} ${t.goal ? '<span class="tag">' + esc(t.goal) + '</span>' : ''}</span></label><button type="button" class="del" data-action="del-task" data-index="${i}:${j}">×</button></div>`).join('') : '<div class="empty">Пока нет действий. Добавь первый маленький шаг.</div>'}</div>
+  </div>`;
+}
+
+function addTask(i) {
+  const text = document.getElementById('taskText').value.trim();
+  if (!text) return;
+  data.monthly[i] ??= [];
+  data.monthly[i].push({ text, goal: document.getElementById('taskGoal').value, done: false });
+  save();
+  openMonth(i);
+  renderMonthProgress();
+}
+
+function renderMonthProgress() {
+  const p = document.querySelectorAll('.month');
+  if (!p.length) return;
+  p.forEach((el, i) => {
+    const a = data.monthly[i] || [];
+    el.querySelector('small').textContent = `${a.filter(x => x.done).length}/${a.length} выполнено`;
+    el.querySelector('i').style.width = (a.length ? 100 * a.filter(x => x.done).length / a.length : 0) + '%';
+  });
+}
+
+function loadReflectionForm(mIdx) {
+  const r = data.reflections[mIdx] || {};
+  ['wins', 'hard', 'learned', 'next', 'thanks'].forEach(k => {
+    const el = document.getElementById('refl_' + k);
+    if (el) el.value = r[k] || '';
+  });
+}
+
+function saveReflection() {
+  const i = document.getElementById('reflectionMonth').value;
+  data.reflections[i] = {};
+  ['wins', 'hard', 'learned', 'next', 'thanks'].forEach(k => data.reflections[i][k] = document.getElementById('refl_' + k).value);
+  save();
+  render();
+}
+
+function changeYear() {
+  const y = +document.getElementById('planYear').value;
+  if (y < 2024 || y > 2100) return;
+  data.year = y;
+  save();
+  render();
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'moi-god-' + data.year + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Файл подготовлен');
+}
+
+function importData(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      data = { ...blank(), ...JSON.parse(r.result) };
+      save();
+      render();
+      toast('Данные импортированы');
+    } catch (err) {
+      toast('Не удалось прочитать файл');
+    }
+  };
+  r.readAsText(f);
+}
+
+// Единый надёжный обработчик нажатий для Telegram WebView и браузеров
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'modalBackdrop') {
+    closeModal();
+    return;
+  }
+
+  const navBtn = e.target.closest('[data-page], [data-nav]');
+  if (navBtn) {
+    e.preventDefault();
+    const targetPage = navBtn.dataset.page || navBtn.dataset.nav;
+    nav(targetPage);
+    return;
+  }
+
+  const actEl = e.target.closest('[data-action]');
+  if (!actEl) return;
+
+  const action = actEl.dataset.action;
+  const idx = actEl.dataset.index;
+
+  if (action === 'open-auth') openAuthModal(actEl.dataset.mode || (savedAccount ? 'login' : 'register'));
+  else if (action === 'auth-tab') openAuthModal(actEl.dataset.mode);
+  else if (action === 'submit-auth') handleAuthSubmit(actEl.dataset.mode);
+  else if (action === 'logout') logoutAccount();
+  else if (action === 'sync-now') initCloud();
+  else if (action === 'close-modal') closeModal();
+  else if (action === 'save-fields') saveFields(actEl.dataset.group);
+  else if (action === 'add-goal') addGoal();
+  else if (action === 'confirm-del-goal') confirmDeleteGoal(+idx);
+  else if (action === 'del-goal') deleteGoal(+idx);
+  else if (action === 'open-goal-modal') openGoalActionModal(+idx);
+  else if (action === 'save-goal-action') saveGoalAction(+idx);
+  else if (action === 'open-month') openMonth(+idx);
+  else if (action === 'add-task') addTask(+idx);
+  else if (action === 'del-task') {
+    const [mi, ti] = idx.split(':').map(Number);
+    data.monthly[mi].splice(ti, 1);
+    save();
+    openMonth(mi);
+    renderMonthProgress();
+  }
+  else if (action === 'add-hobby') addHobby();
+  else if (action === 'del-hobby') {
+    data.hobbies.splice(+idx, 1);
+    save();
+    render();
+  }
+  else if (action === 'toggle-hobby') {
+    data.hobbies[+idx].done = !data.hobbies[+idx].done;
+    save();
+    render();
+  }
+  else if (action === 'save-reflection') saveReflection();
+  else if (action === 'select-reflection') {
+    const sel = document.getElementById('reflectionMonth');
+    if (sel) {
+      sel.value = idx;
+      loadReflectionForm(idx);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  else if (action === 'change-year') changeYear();
+  else if (action === 'export-data') exportData();
+});
+
+document.addEventListener('input', (e) => {
+  const el = e.target;
+  if (el.dataset.rating !== undefined) {
+    setRating(+el.dataset.rating, el.value);
+  } else if (el.dataset.review) {
+    data.review[el.dataset.review] = el.value;
+    save(false);
+  } else if (el.dataset.future) {
+    data.future[el.dataset.future] = el.value;
+    save(false);
+  } else if (el.dataset.wheel) {
+    data.wheelPriority = el.value;
+    save(false);
+  }
+});
+
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.dataset.toggleTask) {
+    const [mi, ti] = el.dataset.toggleTask.split(':').map(Number);
+    data.monthly[mi][ti].done = el.checked;
+    save(false);
+    openMonth(mi);
+    renderMonthProgress();
+  }
+});
+
+render();
+initCloud();
+</script>
+</body>
+</html>
